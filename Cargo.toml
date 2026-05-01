@@ -1,0 +1,82 @@
+[package]
+name = "mali-g68-mp5-driver"
+version = "0.1.0"
+edition = "2021"
+description = "Open-source Vulkan driver for ARM Mali-G68 MP5 GPU, optimized for emulators"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/lucasgab2230/Mali-G68-MP5Driver"
+keywords = ["mali", "gpu", "vulkan", "driver", "emulator"]
+categories = ["hardware-support", "graphics", "os::android-apis"]
+
+[lib]
+name = "mali_g68"
+crate-type = ["cdylib", "rlib"]
+
+[[bench]]
+name = "shader_compile"
+harness = false
+
+[dependencies]
+# Vulkan API bindings
+ash = "0.38"
+
+# Bitflags for hardware register definitions
+bitflags = "2.6"
+bitfield = "0.17"
+
+# System / FFI
+libc = "0.2"
+nix = { version = "0.29", features = ["mman", "ioctl", "fs"] }
+
+# DRM/GPU subsystem
+drm = "0.12"
+drm-ffi = "0.4"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Concurrency
+parking_lot = "0.12"
+crossbeam-channel = "0.5"
+
+# Collections & utilities
+hashbrown = "0.14"
+rustc-hash = "2.0"
+smallvec = "1.13"
+typed-arena = "2.0"
+
+# Serialization (for pipeline cache)
+bincode = "1.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Shader compiler FFI (piper / SPIR-V)
+spirv = "0.3"
+
+[build-dependencies]
+bindgen = "0.69"
+cc = "1.0"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 1
+debug = 2
+
+[features]
+default = ["vulkan_1_3"]
+vulkan_1_1 = []
+vulkan_1_2 = ["vulkan_1_1"]
+vulkan_1_3 = ["vulkan_1_2"]
+debug_cmds = []
+trace = []
