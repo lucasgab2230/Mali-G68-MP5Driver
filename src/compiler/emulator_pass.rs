@@ -364,20 +364,29 @@ mod tests {
     #[test]
     fn test_detect_vertex_pattern() {
         let shader = NirShader::new(ShaderStage::Vertex);
-        assert_eq!(detect_emulator_pattern(&shader), EmulatorPattern::VertexTransform);
+        assert_eq!(
+            detect_emulator_pattern(&shader),
+            EmulatorPattern::VertexTransform
+        );
     }
 
     #[test]
     fn test_detect_fragment_pattern() {
         let mut shader = NirShader::new(ShaderStage::Fragment);
         shader.uses_textures = true;
-        assert_eq!(detect_emulator_pattern(&shader), EmulatorPattern::FragmentTexturing);
+        assert_eq!(
+            detect_emulator_pattern(&shader),
+            EmulatorPattern::FragmentTexturing
+        );
     }
 
     #[test]
     fn test_detect_compute_pattern() {
         let shader = NirShader::new(ShaderStage::Compute);
-        assert_eq!(detect_emulator_pattern(&shader), EmulatorPattern::TextureDecodeCompute);
+        assert_eq!(
+            detect_emulator_pattern(&shader),
+            EmulatorPattern::TextureDecodeCompute
+        );
     }
 
     #[test]

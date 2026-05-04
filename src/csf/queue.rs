@@ -142,8 +142,7 @@ impl CsfPacketHeader {
     /// Decode from a 32-bit word
     pub fn decode(word: u32) -> Self {
         Self {
-            pkt_type: CsfPacketType::try_from(word as u8)
-                .unwrap_or(CsfPacketType::Nop),
+            pkt_type: CsfPacketType::try_from(word as u8).unwrap_or(CsfPacketType::Nop),
             payload_len: ((word >> 8) & 0xFFFF) as u16,
             reserved: ((word >> 24) & 0xFF) as u8,
         }
@@ -213,7 +212,12 @@ pub struct CsfQueue {
 
 impl CsfQueue {
     /// Create a new CSF queue handle (not yet initialized)
-    pub fn new(queue_idx: u32, group_idx: u32, queue_type: QueueType, priority: QueuePriority) -> Self {
+    pub fn new(
+        queue_idx: u32,
+        group_idx: u32,
+        queue_type: QueueType,
+        priority: QueuePriority,
+    ) -> Self {
         Self {
             queue_idx,
             group_idx,

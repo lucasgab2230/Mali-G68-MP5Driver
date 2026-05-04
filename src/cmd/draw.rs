@@ -117,7 +117,9 @@ impl PrimitiveTopology {
         match self {
             PrimitiveTopology::PointList => 1,
             PrimitiveTopology::LineList | PrimitiveTopology::LineStrip => 2,
-            PrimitiveTopology::TriangleList | PrimitiveTopology::TriangleStrip | PrimitiveTopology::TriangleFan => 3,
+            PrimitiveTopology::TriangleList
+            | PrimitiveTopology::TriangleStrip
+            | PrimitiveTopology::TriangleFan => 3,
             _ => 1,
         }
     }
@@ -233,7 +235,11 @@ pub fn encode_draw_cmd(info: &DrawInfo) -> [u32; 6] {
 
 /// Encode an indexed draw command into CSF command stream words
 pub fn encode_draw_indexed_cmd(info: &DrawIndexedInfo) -> [u32; 8] {
-    let index_type_flag = if info.index_type == IndexType::U32 { 1u32 } else { 0 };
+    let index_type_flag = if info.index_type == IndexType::U32 {
+        1u32
+    } else {
+        0
+    };
     [
         (CsfPacketType::DrawIndexed as u32) | (7 << 8), // header
         info.index_count,

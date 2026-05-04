@@ -20,16 +20,16 @@
 #![warn(missing_docs)]
 #![allow(clippy::too_many_arguments)]
 
-pub mod gpu;
+pub mod cmd;
+pub mod compiler;
 pub mod csf;
+pub mod device;
+pub mod emulator;
+pub mod gpu;
 pub mod mem;
 pub mod mmu;
-pub mod compiler;
-pub mod cmd;
-pub mod emulator;
-pub mod device;
-pub mod vulkan;
 pub mod util;
+pub mod vulkan;
 
 /// Driver version
 pub const DRIVER_VERSION: u32 = 1;

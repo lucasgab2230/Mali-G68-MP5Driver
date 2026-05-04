@@ -91,7 +91,10 @@ pub struct VkDevice {
 
 impl VkDevice {
     /// Create a new logical device
-    pub fn create(physical_device: VkPhysicalDevice, create_info: &VkDeviceCreateInfo) -> Result<Self, DeviceError> {
+    pub fn create(
+        physical_device: VkPhysicalDevice,
+        create_info: &VkDeviceCreateInfo,
+    ) -> Result<Self, DeviceError> {
         info!(target: LOG_TARGET, "Creating VkDevice on '{}'", physical_device.device_name());
 
         // Validate extensions

@@ -254,9 +254,18 @@ mod tests {
 
     #[test]
     fn test_bin_size_optimal() {
-        assert_eq!(BinSize::optimal_for_render_target(640, 480, true), BinSize::B64x64);
-        assert_eq!(BinSize::optimal_for_render_target(256, 256, false), BinSize::B32x32);
-        assert_eq!(BinSize::optimal_for_render_target(1920, 1080, false), BinSize::B128x128);
+        assert_eq!(
+            BinSize::optimal_for_render_target(640, 480, true),
+            BinSize::B64x64
+        );
+        assert_eq!(
+            BinSize::optimal_for_render_target(256, 256, false),
+            BinSize::B32x32
+        );
+        assert_eq!(
+            BinSize::optimal_for_render_target(1920, 1080, false),
+            BinSize::B128x128
+        );
     }
 
     #[test]
@@ -264,7 +273,7 @@ mod tests {
         let gpu = GpuInfo::mali_g68_mp5();
         let config = TilerConfig::new(&gpu, 640, 480);
         assert_eq!(config.bins_x(), 10); // 640 / 64
-        assert_eq!(config.bins_y(), 8);  // 480 / 64
+        assert_eq!(config.bins_y(), 8); // 480 / 64
         assert_eq!(config.total_bins(), 80);
     }
 

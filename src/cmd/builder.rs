@@ -4,8 +4,8 @@
 //! The builder tracks state changes and minimizes redundant state
 //! writes to the command stream.
 
-use crate::cmd::draw::{DrawInfo, DrawIndexedInfo, PrimitiveTopology, VertexBindingDesc};
 use crate::cmd::compute::DispatchInfo;
+use crate::cmd::draw::{DrawIndexedInfo, DrawInfo, PrimitiveTopology, VertexBindingDesc};
 use crate::cmd::transfer::BufferCopyRegion;
 use crate::csf::queue::CsfPacketType;
 use crate::LOG_TARGET;
@@ -148,11 +148,13 @@ impl CommandBufferBuilder {
         self.render_pass.has_stencil = has_stencil;
 
         // Encode begin render pass command
-        self.commands.push((CsfPacketType::BeginRenderPass as u32) | (5 << 8));
+        self.commands
+            .push((CsfPacketType::BeginRenderPass as u32) | (5 << 8));
         self.commands.push(width);
         self.commands.push(height);
         self.commands.push(num_color_attachments);
-        self.commands.push((has_depth as u32) | ((has_stencil as u32) << 1));
+        self.commands
+            .push((has_depth as u32) | ((has_stencil as u32) << 1));
         self.commands.push(0); // reserved
 
         self.size_bytes += 24;
@@ -170,7 +172,8 @@ impl CommandBufferBuilder {
         }
         self.render_pass.inside = false;
 
-        self.commands.push((CsfPacketType::EndRenderPass as u32) | (0 << 8));
+        self.commands
+            .push((CsfPacketType::EndRenderPass as u32) | (0 << 8));
         self.size_bytes += 4;
         trace!(target: LOG_TARGET, "CommandBuffer {:x}: end render pass", self.handle);
     }
@@ -182,7 +185,8 @@ impl CommandBufferBuilder {
         }
         self.pipeline.graphics_pipeline = pipeline_addr;
 
-        self.commands.push((CsfPacketType::SetShaderProgram as u32) | (2 << 8));
+        self.commands
+            .push((CsfPacketType::SetShaderProgram as u32) | (2 << 8));
         self.commands.push(pipeline_addr as u32);
         self.commands.push((pipeline_addr >> 32) as u32);
         self.size_bytes += 12;
@@ -195,7 +199,8 @@ impl CommandBufferBuilder {
         }
         self.pipeline.compute_pipeline = pipeline_addr;
 
-        self.commands.push((CsfPacketType::SetShaderProgram as u32) | (2 << 8));
+        self.commands
+            .push((CsfPacketType::SetShaderProgram as u32) | (2 << 8));
         self.commands.push(pipeline_addr as u32);
         self.commands.push((pipeline_addr >> 32) as u32);
         self.size_bytes += 12;
@@ -206,7 +211,8 @@ impl CommandBufferBuilder {
         self.pipeline.vertex_buffer_count = bindings.len() as u32;
 
         let payload_len = 1 + (bindings.len() as u32 * 3);
-        self.commands.push((CsfPacketType::BindVertexBuffer as u32) | ((payload_len) << 8));
+        self.commands
+            .push((CsfPacketType::BindVertexBuffer as u32) | ((payload_len) << 8));
         self.commands.push(first_binding);
         for binding in bindings {
             self.commands.push(binding.gpu_addr as u32);
@@ -221,7 +227,8 @@ impl CommandBufferBuilder {
         self.pipeline.descriptor_set_count = set_addrs.len() as u32;
 
         let payload_len = 1 + (set_addrs.len() as u32 * 2);
-        self.commands.push((CsfPacketType::BindDescriptorSet as u32) | ((payload_len) << 8));
+        self.commands
+            .push((CsfPacketType::BindDescriptorSet as u32) | ((payload_len) << 8));
         self.commands.push(first_set);
         for addr in set_addrs {
             self.commands.push(*addr as u32);
@@ -231,8 +238,17 @@ impl CommandBufferBuilder {
     }
 
     /// Set viewport
-    pub fn set_viewport(&mut self, x: f32, y: f32, width: f32, height: f32, min_depth: f32, max_depth: f32) {
-        self.commands.push((CsfPacketType::SetViewport as u32) | (6 << 8));
+    pub fn set_viewport(
+        &mut self,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        min_depth: f32,
+        max_depth: f32,
+    ) {
+        self.commands
+            .push((CsfPacketType::SetViewport as u32) | (6 << 8));
         self.commands.push(x.to_bits());
         self.commands.push(y.to_bits());
         self.commands.push(width.to_bits());
@@ -244,7 +260,8 @@ impl CommandBufferBuilder {
 
     /// Set scissor rectangle
     pub fn set_scissor(&mut self, x: i32, y: i32, width: u32, height: u32) {
-        self.commands.push((CsfPacketType::SetScissor as u32) | (4 << 8));
+        self.commands
+            .push((CsfPacketType::SetScissor as u32) | (4 << 8));
         self.commands.push(x as u32);
         self.commands.push(y as u32);
         self.commands.push(width);
@@ -265,7 +282,8 @@ impl CommandBufferBuilder {
 
     /// Record a draw command (indexed)
     pub fn draw_indexed(&mut self, info: &DrawIndexedInfo) {
-        self.commands.push((CsfPacketType::DrawIndexed as u32) | (7 << 8));
+        self.commands
+            .push((CsfPacketType::DrawIndexed as u32) | (7 << 8));
         self.commands.push(info.index_count);
         self.commands.push(info.instance_count);
         self.commands.push(info.first_index);
@@ -279,7 +297,8 @@ impl CommandBufferBuilder {
 
     /// Record a compute dispatch
     pub fn dispatch(&mut self, info: &DispatchInfo) {
-        self.commands.push((CsfPacketType::Dispatch as u32) | (3 << 8));
+        self.commands
+            .push((CsfPacketType::Dispatch as u32) | (3 << 8));
         self.commands.push(info.group_count_x);
         self.commands.push(info.group_count_y);
         self.commands.push(info.group_count_z);
@@ -289,7 +308,8 @@ impl CommandBufferBuilder {
 
     /// Record a buffer copy
     pub fn copy_buffer(&mut self, regions: &[BufferCopyRegion]) {
-        self.commands.push((CsfPacketType::CopyBuffer as u32) | (((regions.len() as u32 * 3) + 1) << 8));
+        self.commands
+            .push((CsfPacketType::CopyBuffer as u32) | (((regions.len() as u32 * 3) + 1) << 8));
         self.commands.push(regions.len() as u32);
         for region in regions {
             self.commands.push(region.src_offset as u32);
@@ -303,7 +323,8 @@ impl CommandBufferBuilder {
     /// Push constants
     pub fn push_constants(&mut self, offset: u32, data: &[u32]) {
         let payload_len = 1 + data.len() as u32;
-        self.commands.push((CsfPacketType::PushConstants as u32) | (payload_len << 8));
+        self.commands
+            .push((CsfPacketType::PushConstants as u32) | (payload_len << 8));
         self.commands.push(offset);
         self.commands.extend_from_slice(data);
         self.size_bytes += (4 + payload_len * 4) as u64;
@@ -311,7 +332,8 @@ impl CommandBufferBuilder {
 
     /// Insert a pipeline barrier
     pub fn pipeline_barrier(&mut self, src_stage_mask: u32, dst_stage_mask: u32) {
-        self.commands.push((CsfPacketType::CacheFlush as u32) | (2 << 8));
+        self.commands
+            .push((CsfPacketType::CacheFlush as u32) | (2 << 8));
         self.commands.push(src_stage_mask);
         self.commands.push(dst_stage_mask);
         self.size_bytes += 12;

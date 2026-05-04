@@ -4,11 +4,11 @@
 //! shader programs, etc.). The slab allocator suballocates from large buffer
 //! objects to minimize DRM allocation overhead and improve cache locality.
 
-use crate::mem::bo::{BoFlags, BufferObject, BoError};
+use crate::mem::bo::{BoError, BoFlags, BufferObject};
 use crate::LOG_TARGET;
 use log::debug;
-use std::os::unix::io::RawFd;
 use std::collections::VecDeque;
+use std::os::unix::io::RawFd;
 
 /// Default slab size (64 KB)
 pub const DEFAULT_SLAB_SIZE: u64 = 64 * 1024;
@@ -92,7 +92,9 @@ impl SlabAllocator {
 
         // Create a new slab
         let slab_idx = self.create_slab(aligned_size.max(self.slab_size), flags)?;
-        let alloc = self.try_alloc_from_slab(slab_idx as usize, aligned_size)?.unwrap();
+        let alloc = self
+            .try_alloc_from_slab(slab_idx as usize, aligned_size)?
+            .unwrap();
         self.total_allocs += 1;
         Ok(alloc)
     }
@@ -107,7 +109,11 @@ impl SlabAllocator {
     }
 
     /// Try to allocate from a specific slab
-    fn try_alloc_from_slab(&mut self, slab_idx: usize, size: u64) -> Result<Option<SlabAllocation>, SlabError> {
+    fn try_alloc_from_slab(
+        &mut self,
+        slab_idx: usize,
+        size: u64,
+    ) -> Result<Option<SlabAllocation>, SlabError> {
         let slab = &mut self.slabs[slab_idx];
 
         // Try the free list first

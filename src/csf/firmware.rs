@@ -257,7 +257,11 @@ mod tests {
 
     #[test]
     fn test_firmware_version_display() {
-        let v = CsfFirmwareVersion { major: 1, minor: 2, patch: 3 };
+        let v = CsfFirmwareVersion {
+            major: 1,
+            minor: 2,
+            patch: 3,
+        };
         assert_eq!(format!("{}", v), "1.2.3");
     }
 }

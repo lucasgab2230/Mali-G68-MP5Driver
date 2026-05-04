@@ -23,7 +23,11 @@ impl VkFence {
     /// Create a new fence
     pub fn new(signaled: bool) -> Self {
         Self {
-            state: if signaled { FenceState::Signaled } else { FenceState::Unsignaled },
+            state: if signaled {
+                FenceState::Signaled
+            } else {
+                FenceState::Unsignaled
+            },
             signaled,
         }
     }
@@ -70,12 +74,18 @@ pub enum SemaphoreType {
 impl VkSemaphore {
     /// Create a new binary semaphore
     pub fn binary() -> Self {
-        Self { sem_type: SemaphoreType::Binary, value: 0 }
+        Self {
+            sem_type: SemaphoreType::Binary,
+            value: 0,
+        }
     }
 
     /// Create a new timeline semaphore
     pub fn timeline() -> Self {
-        Self { sem_type: SemaphoreType::Timeline, value: 0 }
+        Self {
+            sem_type: SemaphoreType::Timeline,
+            value: 0,
+        }
     }
 
     /// Get the semaphore type

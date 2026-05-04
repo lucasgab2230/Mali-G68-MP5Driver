@@ -19,10 +19,10 @@
 //! - Texture sampling optimization for decoded textures
 //! - Compute shader optimization for texture decoding (BCn, ASTC)
 
-pub mod nir;
-pub mod valhall;
-pub mod optimize;
 pub mod emulator_pass;
+pub mod nir;
+pub mod optimize;
+pub mod valhall;
 
 pub use nir::NirShader;
 pub use valhall::ValhallCompiler;

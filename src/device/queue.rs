@@ -3,8 +3,8 @@
 //! Provides high-level queue submission interface wrapping
 //! the CSF command queues.
 
-use crate::csf::queue::{CsfQueue, QueueType, QueueStats};
 use crate::cmd::builder::CommandBufferBuilder;
+use crate::csf::queue::{CsfQueue, QueueStats, QueueType};
 use crate::LOG_TARGET;
 use log::debug;
 

@@ -102,12 +102,7 @@ impl BufferObject {
     /// * `size` - Buffer size in bytes
     /// * `flags` - Buffer creation flags
     /// * `name` - Debug name for the buffer
-    pub fn new(
-        drm_fd: RawFd,
-        size: u64,
-        flags: BoFlags,
-        name: &str,
-    ) -> Result<Self, BoError> {
+    pub fn new(drm_fd: RawFd, size: u64, flags: BoFlags, name: &str) -> Result<Self, BoError> {
         // Align size to page boundary
         let aligned_size = (size + 4095) & !4095;
 
@@ -219,11 +214,7 @@ impl BufferObject {
             });
         }
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                data.as_ptr(),
-                ptr.add(offset as usize),
-                data.len(),
-            );
+            core::ptr::copy_nonoverlapping(data.as_ptr(), ptr.add(offset as usize), data.len());
         }
         Ok(())
     }
@@ -239,11 +230,7 @@ impl BufferObject {
             });
         }
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                ptr.add(offset as usize),
-                data.as_mut_ptr(),
-                data.len(),
-            );
+            core::ptr::copy_nonoverlapping(ptr.add(offset as usize), data.as_mut_ptr(), data.len());
         }
         Ok(())
     }
@@ -280,7 +267,8 @@ impl BufferObject {
     fn drm_bo_mmap_offset(_fd: RawFd, _handle: u32) -> Result<u64, BoError> {
         // In production: DRM_IOCTL_GEM_MMAP_OFFSET
         // Returns the fake offset used by mmap()
-        static NEXT_ADDR: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0x1_0000_0000);
+        static NEXT_ADDR: std::sync::atomic::AtomicU64 =
+            std::sync::atomic::AtomicU64::new(0x1_0000_0000);
         let addr = NEXT_ADDR.fetch_add(0x100_0000, std::sync::atomic::Ordering::Relaxed);
         Ok(addr)
     }

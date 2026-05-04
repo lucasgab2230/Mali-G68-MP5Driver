@@ -4,13 +4,13 @@
 //! specific usage patterns. This is critical for emulators which create
 //! many small buffers and images.
 
-use crate::mem::bo::{BoFlags, BoError};
-use crate::mem::slab::{SlabAllocator, SlabAllocation};
+use crate::mem::bo::{BoError, BoFlags};
+use crate::mem::slab::{SlabAllocation, SlabAllocator};
 use crate::LOG_TARGET;
 use log::debug;
-use std::os::unix::io::RawFd;
 use parking_lot::RwLock;
 use std::collections::HashMap;
+use std::os::unix::io::RawFd;
 
 /// Pool type for specialization
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -35,7 +35,7 @@ impl PoolType {
     /// Get the recommended pool size for this type
     pub fn recommended_size(&self) -> u64 {
         match self {
-            PoolType::Texture => 64 * 1024 * 1024,  // 64 MB
+            PoolType::Texture => 64 * 1024 * 1024,   // 64 MB
             PoolType::Vertex => 16 * 1024 * 1024,    // 16 MB
             PoolType::Command => 4 * 1024 * 1024,    // 4 MB
             PoolType::Descriptor => 2 * 1024 * 1024, // 2 MB
@@ -48,12 +48,12 @@ impl PoolType {
     /// Get the recommended alignment for this pool type
     pub fn recommended_alignment(&self) -> u64 {
         match self {
-            PoolType::Texture => 256,    // Texture alignment
-            PoolType::Vertex => 16,      // Vertex buffer alignment
-            PoolType::Command => 64,     // Command buffer alignment
-            PoolType::Descriptor => 32,  // Descriptor alignment
-            PoolType::Shader => 64,      // Shader program alignment
-            PoolType::Tiler => 4096,     // Tiler page alignment
+            PoolType::Texture => 256,   // Texture alignment
+            PoolType::Vertex => 16,     // Vertex buffer alignment
+            PoolType::Command => 64,    // Command buffer alignment
+            PoolType::Descriptor => 32, // Descriptor alignment
+            PoolType::Shader => 64,     // Shader program alignment
+            PoolType::Tiler => 4096,    // Tiler page alignment
             PoolType::General => 16,
         }
     }

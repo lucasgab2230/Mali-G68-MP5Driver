@@ -3,12 +3,12 @@
 //! Handles GPU device discovery, initialization, and teardown.
 
 use crate::csf::firmware::CsfFirmware;
-use crate::csf::queue::{CsfQueue, QueueType, QueuePriority};
-use crate::gpu::info::{GpuInfo, GpuDetectError};
+use crate::csf::queue::{CsfQueue, QueuePriority, QueueType};
+use crate::emulator::async_compute::AsyncComputeManager;
+use crate::emulator::cache::PipelineCache;
+use crate::gpu::info::{GpuDetectError, GpuInfo};
 use crate::mem::pool::PoolManager;
 use crate::mmu::as_::AddressSpace;
-use crate::emulator::cache::PipelineCache;
-use crate::emulator::async_compute::AsyncComputeManager;
 use crate::DriverConfig;
 use crate::LOG_TARGET;
 use log::info;
@@ -66,8 +66,7 @@ impl MaliDevice {
         let pool_manager = PoolManager::new(drm_fd);
 
         // 6. Create address space
-        let address_space = AddressSpace::new(0, drm_fd, std::ptr::null_mut())
-            .ok();
+        let address_space = AddressSpace::new(0, drm_fd, std::ptr::null_mut()).ok();
 
         info!(target: LOG_TARGET, "Mali-G68 MP5 device initialized successfully");
         info!(target: LOG_TARGET, "  {} shader cores, {} MB L2", gpu_info.num_shader_cores, gpu_info.l2_cache_size / (1024 * 1024));
@@ -127,25 +126,29 @@ impl MaliDevice {
         queue_configs
             .iter()
             .enumerate()
-            .map(|(i, (qtype, priority))| {
-                CsfQueue::new(i as u32, 0, *qtype, *priority)
-            })
+            .map(|(i, (qtype, priority))| CsfQueue::new(i as u32, 0, *qtype, *priority))
             .collect()
     }
 
     /// Get the graphics queue
     pub fn graphics_queue(&self) -> Option<&CsfQueue> {
-        self.queues.iter().find(|q| q.queue_type() == QueueType::Graphics)
+        self.queues
+            .iter()
+            .find(|q| q.queue_type() == QueueType::Graphics)
     }
 
     /// Get the compute queue
     pub fn compute_queue(&self) -> Option<&CsfQueue> {
-        self.queues.iter().find(|q| q.queue_type() == QueueType::Compute)
+        self.queues
+            .iter()
+            .find(|q| q.queue_type() == QueueType::Compute)
     }
 
     /// Get the transfer queue
     pub fn transfer_queue(&self) -> Option<&CsfQueue> {
-        self.queues.iter().find(|q| q.queue_type() == QueueType::Transfer)
+        self.queues
+            .iter()
+            .find(|q| q.queue_type() == QueueType::Transfer)
     }
 
     /// Check if the device is initialized
