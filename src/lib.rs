@@ -17,7 +17,7 @@
 //! Samsung Galaxy A26 5G (Exynos 1280, Mali-G68 MP5, 5 shader cores)
 
 #![deny(unsafe_op_in_unsafe_fn)]
-#![warn(missing_docs)]
+#![allow(missing_docs)]
 #![allow(clippy::too_many_arguments)]
 
 pub mod cmd;

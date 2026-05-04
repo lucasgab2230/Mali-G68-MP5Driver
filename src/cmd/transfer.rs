@@ -31,7 +31,7 @@ pub struct ImageSubresourceLayers {
     pub layer_count: u32,
 }
 
-/// Image aspect flags
+// Image aspect flags
 bitflags::bitflags! {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct ImageAspectFlags: u32 {
