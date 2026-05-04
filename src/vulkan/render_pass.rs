@@ -26,29 +26,43 @@ pub struct AttachmentDescription {
 /// Attachment load operation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AttachmentLoadOp {
+    /// Load existing contents
     Load,
+    /// Clear the attachment
     Clear,
+    /// Contents are undefined
     DontCare,
 }
 
 /// Attachment store operation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AttachmentStoreOp {
+    /// Store results to memory
     Store,
+    /// Results may be discarded
     DontCare,
 }
 
 /// Image layout
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImageLayout {
+    /// Initial undefined state
     Undefined,
+    /// General purpose layout
     General,
+    /// Optimal for color attachments
     ColorAttachmentOptimal,
+    /// Optimal for depth/stencil attachments
     DepthStencilAttachmentOptimal,
+    /// Read-only for depth/stencil
     DepthStencilReadOnlyOptimal,
+    /// Optimal for shader sampling
     ShaderReadOnlyOptimal,
+    /// Source for transfer operations
     TransferSrcOptimal,
+    /// Destination for transfer operations
     TransferDstOptimal,
+    /// Optimized for presentation to the screen
     PresentSrcKhr,
 }
 
