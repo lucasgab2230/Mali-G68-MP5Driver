@@ -153,13 +153,13 @@ fn dead_code_elimination(shader: &mut NirShader) -> u32 {
                 let has_side_effect = matches!(
                     instr.op,
                     NirOp::StoreOutput
-                    | NirOp::StoreSsbo
-                    | NirOp::StoreShared
-                    | NirOp::Barrier
-                    | NirOp::Discard
-                    | NirOp::Demote
-                    | NirOp::EmitVertex
-                    | NirOp::EndPrimitive
+                        | NirOp::StoreSsbo
+                        | NirOp::StoreShared
+                        | NirOp::Barrier
+                        | NirOp::Discard
+                        | NirOp::Demote
+                        | NirOp::EmitVertex
+                        | NirOp::EndPrimitive
                 );
 
                 // Keep instructions with destinations (they might be used)

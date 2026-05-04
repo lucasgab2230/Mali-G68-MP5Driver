@@ -97,9 +97,17 @@ impl AddressSpace {
     }
 
     /// Map a buffer object into this address space
-    pub fn map_bo(&mut self, bo: &BufferObject, region: VaRegion, flags: PteFlags) -> Result<u64, AsError> {
+    pub fn map_bo(
+        &mut self,
+        bo: &BufferObject,
+        region: VaRegion,
+        flags: PteFlags,
+    ) -> Result<u64, AsError> {
         // Find the VA region allocator
-        let region_idx = self.region_allocators.iter().position(|r| r.region == region)
+        let region_idx = self
+            .region_allocators
+            .iter()
+            .position(|r| r.region == region)
             .ok_or(AsError::InvalidRegion)?;
 
         // Allocate a VA range
@@ -152,7 +160,13 @@ impl AddressSpace {
     }
 
     /// Update page table entries for a mapping
-    fn update_page_table(&mut self, va: u64, pa: u64, size: u64, flags: PteFlags) -> Result<(), AsError> {
+    fn update_page_table(
+        &mut self,
+        va: u64,
+        pa: u64,
+        size: u64,
+        flags: PteFlags,
+    ) -> Result<(), AsError> {
         // Walk the 3-level page table and create/update entries
         // Level 1: PGD (Page Global Directory)
         // Level 2: PMD (Page Middle Directory)

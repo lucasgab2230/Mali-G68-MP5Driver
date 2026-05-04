@@ -143,8 +143,16 @@ mod tests {
     #[test]
     fn test_encode_copy_buffer() {
         let regions = vec![
-            BufferCopyRegion { src_offset: 0, dst_offset: 1024, size: 512 },
-            BufferCopyRegion { src_offset: 512, dst_offset: 2048, size: 256 },
+            BufferCopyRegion {
+                src_offset: 0,
+                dst_offset: 1024,
+                size: 512,
+            },
+            BufferCopyRegion {
+                src_offset: 512,
+                dst_offset: 2048,
+                size: 256,
+            },
         ];
         let words = encode_copy_buffer_cmd(&regions);
         assert!(words.len() >= 2);

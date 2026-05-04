@@ -374,7 +374,9 @@ mod tests {
         let device = VkPhysicalDevice::new(gpu_info, ash::vk::API_VERSION_1_3);
         let mem_props = device.memory_properties();
         assert_eq!(mem_props.memory_types.len(), 3);
-        assert!(mem_props.memory_types[0].property_flags.contains(MemoryPropertyFlags::DEVICE_LOCAL));
+        assert!(mem_props.memory_types[0]
+            .property_flags
+            .contains(MemoryPropertyFlags::DEVICE_LOCAL));
     }
 
     #[test]

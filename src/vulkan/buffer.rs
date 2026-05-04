@@ -32,14 +32,23 @@ pub struct VkBuffer {
 impl VkBuffer {
     /// Create a new buffer
     pub fn new(size: u64, usage: BufferUsageFlags) -> Self {
-        Self { gpu_addr: 0, size, usage, memory: None }
+        Self {
+            gpu_addr: 0,
+            size,
+            usage,
+            memory: None,
+        }
     }
 
     /// Get the GPU address
-    pub fn gpu_addr(&self) -> u64 { self.gpu_addr }
+    pub fn gpu_addr(&self) -> u64 {
+        self.gpu_addr
+    }
 
     /// Get the buffer size
-    pub fn size(&self) -> u64 { self.size }
+    pub fn size(&self) -> u64 {
+        self.size
+    }
 
     /// Bind memory to the buffer
     pub fn bind_memory(&mut self, memory: super::memory::VkDeviceMemory) {
@@ -53,7 +62,10 @@ mod tests {
 
     #[test]
     fn test_buffer_creation() {
-        let buf = VkBuffer::new(1024, BufferUsageFlags::VERTEX_BUFFER | BufferUsageFlags::TRANSFER_DST);
+        let buf = VkBuffer::new(
+            1024,
+            BufferUsageFlags::VERTEX_BUFFER | BufferUsageFlags::TRANSFER_DST,
+        );
         assert_eq!(buf.size(), 1024);
         assert!(buf.usage.contains(BufferUsageFlags::VERTEX_BUFFER));
     }

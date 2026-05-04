@@ -114,7 +114,7 @@ impl CompressedFormat {
     pub fn decoded_bytes_per_pixel(&self) -> u32 {
         match self {
             CompressedFormat::BC6H => 8, // RGBA16 float
-            _ => 4, // RGBA8
+            _ => 4,                      // RGBA8
         }
     }
 
@@ -227,7 +227,10 @@ impl AsyncComputeManager {
     }
 
     /// Submit a texture decode request
-    pub fn submit_decode(&mut self, request: &TextureDecodeRequest) -> Result<DecodeHandle, AsyncComputeError> {
+    pub fn submit_decode(
+        &mut self,
+        request: &TextureDecodeRequest,
+    ) -> Result<DecodeHandle, AsyncComputeError> {
         if !self.available {
             return Err(AsyncComputeError::QueueNotAvailable);
         }

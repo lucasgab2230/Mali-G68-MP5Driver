@@ -17,8 +17,8 @@
 //! - Queue 1: Compute (async compute for texture decoding, etc.)
 //! - Queue 2: Transfer (copy/blit operations)
 
-pub mod queue;
 pub mod firmware;
+pub mod queue;
 
-pub use queue::CsfQueue;
 pub use firmware::CsfFirmware;
+pub use queue::CsfQueue;

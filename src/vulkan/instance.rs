@@ -6,8 +6,8 @@
 //! - Physical device discovery
 
 use crate::gpu::info::GpuInfo;
-use crate::LOG_TARGET;
 use crate::vulkan::physical::VkPhysicalDevice;
+use crate::LOG_TARGET;
 use log::{info, warn};
 
 /// Re-export the Vulkan API version from crate root
@@ -24,9 +24,7 @@ pub const INSTANCE_EXTENSIONS: &[&str] = &[
 ];
 
 /// Supported instance layers
-pub const INSTANCE_LAYERS: &[&str] = &[
-    "VK_LAYER_KHRONOS_validation",
-];
+pub const INSTANCE_LAYERS: &[&str] = &["VK_LAYER_KHRONOS_validation"];
 
 /// Vulkan Instance
 pub struct VkInstance {

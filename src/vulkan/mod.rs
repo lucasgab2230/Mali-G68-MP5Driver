@@ -23,19 +23,19 @@
 //! | Swapchain (WSI)           | Planned      |
 //! | Dynamic rendering         | Planned      |
 
-pub mod instance;
-pub mod physical;
-pub mod device;
-pub mod memory;
 pub mod buffer;
-pub mod image;
-pub mod pipeline;
-pub mod shader;
 pub mod descriptor;
+pub mod device;
+pub mod image;
+pub mod instance;
+pub mod memory;
+pub mod physical;
+pub mod pipeline;
 pub mod render_pass;
-pub mod sync;
+pub mod shader;
 pub mod swapchain;
+pub mod sync;
 
+pub use device::VkDevice;
 pub use instance::VkInstance;
 pub use physical::VkPhysicalDevice;
-pub use device::VkDevice;

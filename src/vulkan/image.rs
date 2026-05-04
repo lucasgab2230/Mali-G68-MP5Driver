@@ -107,8 +107,7 @@ impl ImageFormat {
             ImageFormat::D32Sfloat => 4,
             ImageFormat::D24UnormS8Uint => 4,
             ImageFormat::D32SfloatS8Uint => 8,
-            ImageFormat::R5G6B5UnormPack16
-            | ImageFormat::R4G4B4A4UnormPack16 => 2,
+            ImageFormat::R5G6B5UnormPack16 | ImageFormat::R4G4B4A4UnormPack16 => 2,
             _ => 0, // Compressed formats vary
         }
     }
@@ -118,11 +117,11 @@ impl ImageFormat {
         matches!(
             self,
             ImageFormat::R8G8B8A8Unorm
-            | ImageFormat::B8G8R8A8Unorm
-            | ImageFormat::R8G8B8A8Srgb
-            | ImageFormat::B8G8R8A8Srgb
-            | ImageFormat::R5G6B5UnormPack16
-            | ImageFormat::D24UnormS8Uint
+                | ImageFormat::B8G8R8A8Unorm
+                | ImageFormat::R8G8B8A8Srgb
+                | ImageFormat::B8G8R8A8Srgb
+                | ImageFormat::R5G6B5UnormPack16
+                | ImageFormat::D24UnormS8Uint
         )
     }
 }
@@ -130,18 +129,28 @@ impl ImageFormat {
 impl VkImage {
     /// Create a new image
     pub fn new(
-        width: u32, height: u32, depth: u32,
-        mip_levels: u32, array_layers: u32,
-        format: ImageFormat, image_type: ImageType,
-        usage: ImageUsageFlags, tiling: ImageTiling,
+        width: u32,
+        height: u32,
+        depth: u32,
+        mip_levels: u32,
+        array_layers: u32,
+        format: ImageFormat,
+        image_type: ImageType,
+        usage: ImageUsageFlags,
+        tiling: ImageTiling,
     ) -> Self {
         let afbc_compressed = tiling == ImageTiling::Optimal && format.supports_afbc();
         Self {
             gpu_addr: 0,
-            width, height, depth,
-            mip_levels, array_layers,
-            format, image_type,
-            usage, tiling,
+            width,
+            height,
+            depth,
+            mip_levels,
+            array_layers,
+            format,
+            image_type,
+            usage,
+            tiling,
             afbc_compressed,
         }
     }
@@ -183,7 +192,11 @@ mod tests {
     #[test]
     fn test_image_creation() {
         let img = VkImage::new(
-            640, 480, 1, 1, 1,
+            640,
+            480,
+            1,
+            1,
+            1,
             ImageFormat::R8G8B8A8Unorm,
             ImageType::Type2D,
             ImageUsageFlags::COLOR_ATTACHMENT | ImageUsageFlags::SAMPLED,
@@ -195,7 +208,17 @@ mod tests {
 
     #[test]
     fn test_image_size() {
-        let img = VkImage::new(256, 256, 1, 1, 1, ImageFormat::R8G8B8A8Unorm, ImageType::Type2D, ImageUsageFlags::SAMPLED, ImageTiling::Optimal);
+        let img = VkImage::new(
+            256,
+            256,
+            1,
+            1,
+            1,
+            ImageFormat::R8G8B8A8Unorm,
+            ImageType::Type2D,
+            ImageUsageFlags::SAMPLED,
+            ImageTiling::Optimal,
+        );
         assert_eq!(img.calculate_size(), 256 * 256 * 4);
     }
 

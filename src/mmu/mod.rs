@@ -82,12 +82,12 @@ impl VaRegion {
     /// Get the size of this region
     pub fn size(&self) -> u64 {
         match self {
-            VaRegion::ShaderCode => 4 * 1024 * 1024,          // 4 MB
-            VaRegion::TilerHeap => 64 * 1024 * 1024,          // 64 MB
-            VaRegion::Buffers => 1024 * 1024 * 1024,          // 1 GB
-            VaRegion::Textures => 2 * 1024 * 1024 * 1024,     // 2 GB
-            VaRegion::Descriptors => 256 * 1024 * 1024,        // 256 MB
-            VaRegion::CommandBuffers => 256 * 1024 * 1024,     // 256 MB
+            VaRegion::ShaderCode => 4 * 1024 * 1024,       // 4 MB
+            VaRegion::TilerHeap => 64 * 1024 * 1024,       // 64 MB
+            VaRegion::Buffers => 1024 * 1024 * 1024,       // 1 GB
+            VaRegion::Textures => 2 * 1024 * 1024 * 1024,  // 2 GB
+            VaRegion::Descriptors => 256 * 1024 * 1024,    // 256 MB
+            VaRegion::CommandBuffers => 256 * 1024 * 1024, // 256 MB
         }
     }
 }

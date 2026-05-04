@@ -16,9 +16,9 @@
 //! and improve cache locality.
 
 pub mod bo;
-pub mod slab;
 pub mod pool;
+pub mod slab;
 
 pub use bo::BufferObject;
-pub use slab::SlabAllocator;
 pub use pool::MemoryPool;
+pub use slab::SlabAllocator;

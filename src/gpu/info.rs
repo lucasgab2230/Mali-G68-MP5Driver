@@ -16,7 +16,7 @@
 //! | Vulkan Version       | 1.3 (with extensions)     |
 //! | AFBC                 | v1.3                      |
 
-use crate::{DRIVER_VERSION, LOG_TARGET, MAX_SHADER_CORES, L2_CACHE_SIZE};
+use crate::{DRIVER_VERSION, L2_CACHE_SIZE, LOG_TARGET, MAX_SHADER_CORES};
 use log::info;
 
 /// GPU product ID for Mali-G68 (from GPU_ID register)
@@ -212,7 +212,11 @@ impl GpuInfo {
 
     /// Compute the GPU name string for Vulkan
     pub fn device_name(&self) -> String {
-        format!("Mali-G68 MP5 ({} cores, {})", self.num_shader_cores, self.soc.name())
+        format!(
+            "Mali-G68 MP5 ({} cores, {})",
+            self.num_shader_cores,
+            self.soc.name()
+        )
     }
 
     /// Compute total FMA throughput per clock

@@ -1,9 +1,9 @@
 //! Vulkan shader module
 
-use crate::compiler::nir::{NirShader, ShaderStage};
-use crate::compiler::valhall::{ValhallCompiler, CompiledShader, CompilerError};
-use crate::compiler::optimize::{optimize_shader, OptLevel};
 use crate::compiler::emulator_pass::optimize_for_emulator;
+use crate::compiler::nir::{NirShader, ShaderStage};
+use crate::compiler::optimize::{optimize_shader, OptLevel};
+use crate::compiler::valhall::{CompiledShader, CompilerError, ValhallCompiler};
 use crate::emulator::cache::hash_spirv;
 use crate::LOG_TARGET;
 use log::debug;
@@ -40,7 +40,11 @@ impl VkShaderModule {
     }
 
     /// Compile the shader module for a specific stage
-    pub fn compile(&mut self, _stage: ShaderStage, opt_level: OptLevel) -> Result<CompiledShader, ShaderError> {
+    pub fn compile(
+        &mut self,
+        _stage: ShaderStage,
+        opt_level: OptLevel,
+    ) -> Result<CompiledShader, ShaderError> {
         // Parse SPIR-V to NIR
         let mut nir = NirShader::from_spirv(&self.spirv)?;
 

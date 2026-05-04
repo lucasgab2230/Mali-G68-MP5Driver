@@ -16,8 +16,8 @@
 //! - **Draw Call Batching**: Merge compatible draw calls to reduce overhead
 //! - **Descriptor Update Merging**: Reduce descriptor set updates
 
-pub mod cache;
 pub mod async_compute;
+pub mod cache;
 
-pub use cache::PipelineCache;
 pub use async_compute::AsyncComputeManager;
+pub use cache::PipelineCache;

@@ -106,17 +106,29 @@ pub struct ValhallReg {
 impl ValhallReg {
     /// Create a GPR reference
     pub fn gpr(index: u8) -> Self {
-        Self { file: RegFile::Gpr, index, comp: 0 }
+        Self {
+            file: RegFile::Gpr,
+            index,
+            comp: 0,
+        }
     }
 
     /// Create a GPR reference with component
     pub fn gpr_comp(index: u8, comp: u8) -> Self {
-        Self { file: RegFile::Gpr, index, comp }
+        Self {
+            file: RegFile::Gpr,
+            index,
+            comp,
+        }
     }
 
     /// Create a uniform register reference
     pub fn uniform(index: u8) -> Self {
-        Self { file: RegFile::Uniform, index, comp: 0 }
+        Self {
+            file: RegFile::Uniform,
+            index,
+            comp: 0,
+        }
     }
 
     /// Encode as a 6-bit register field
@@ -330,9 +342,7 @@ impl ValhallCompiler {
         self.allocate_registers();
 
         // Encode instructions to binary
-        let encoded: Vec<ValhallWord> = self.instructions.iter()
-            .map(|i| i.encode())
-            .collect();
+        let encoded: Vec<ValhallWord> = self.instructions.iter().map(|i| i.encode()).collect();
 
         // Calculate binary size
         let binary_size = encoded.len() * 16; // 16 bytes per instruction
@@ -356,7 +366,11 @@ impl ValhallCompiler {
     }
 
     /// Compile a single NIR function
-    fn compile_function(&mut self, func: &NirFunction, stage: ShaderStage) -> Result<(), CompilerError> {
+    fn compile_function(
+        &mut self,
+        func: &NirFunction,
+        stage: ShaderStage,
+    ) -> Result<(), CompilerError> {
         for block in &func.blocks {
             self.compile_block(block, stage)?;
         }
@@ -372,7 +386,11 @@ impl ValhallCompiler {
     }
 
     /// Compile a single NIR instruction to Valhall
-    fn compile_instr(&mut self, instr: &NirInstr, _stage: ShaderStage) -> Result<(), CompilerError> {
+    fn compile_instr(
+        &mut self,
+        instr: &NirInstr,
+        _stage: ShaderStage,
+    ) -> Result<(), CompilerError> {
         let dest_reg = self.alloc_reg();
         let src0_reg = self.alloc_reg();
         let src1_reg = self.alloc_reg();

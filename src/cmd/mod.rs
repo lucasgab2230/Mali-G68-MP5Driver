@@ -10,9 +10,9 @@
 //! 3. **End**: Finalize the command buffer
 //! 4. **Submit**: Submit to a CSF queue for execution
 
-pub mod draw;
-pub mod compute;
-pub mod transfer;
 pub mod builder;
+pub mod compute;
+pub mod draw;
+pub mod transfer;
 
 pub use builder::CommandBufferBuilder;
