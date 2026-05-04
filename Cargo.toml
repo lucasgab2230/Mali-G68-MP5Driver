@@ -28,9 +28,9 @@ bitfield = "0.17"
 libc = "0.2"
 nix = { version = "0.29", features = ["mman", "ioctl", "fs"] }
 
-# DRM/GPU subsystem
-drm = "0.12"
-drm-ffi = { version = "0.8", features = ["use_bindgen"] }
+# DRM
+drm = "0.12.0"
+drm-ffi = "0.8.0"
 
 # Logging
 log = "0.4"
