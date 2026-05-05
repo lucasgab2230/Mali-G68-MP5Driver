@@ -2,8 +2,77 @@
 //!
 //! Records draw commands into the CSF command stream for the
 //! Mali-G68 MP5 Valhall graphics pipeline.
+//!
+//! Mali-G68 uses tile-based deferred rendering (TBDR), which has
+//! specific optimization opportunities:
+//! - Minimize tile memory traffic
+//! - Optimize for 16x16 tile size (Mali default)
+//! - Use hidden surface removal (HSR) effectively
+//! - Minimize fragment shader invocations via early-Z
 
-use crate::csf::queue::CsfPacketType;
+use crate::csf::CsfPacketType;
+
+/// Tile configuration for Mali-G68 TBDR
+#[derive(Debug, Clone, Copy)]
+pub struct TileConfig {
+    /// Tile width in pixels (Mali default: 16)
+    pub tile_width: u32,
+    /// Tile height in pixels (Mali default: 16)
+    pub tile_height: u32,
+    /// Number of tile bins in X direction
+    pub bins_x: u32,
+    /// Number of tile bins in Y direction
+    pub bins_y: u32,
+    /// Enable hidden surface removal
+    pub enable_hsr: bool,
+    /// Enable early fragment depth test
+    pub enable_early_z: bool,
+}
+
+impl TileConfig {
+    /// Create tile config for given render target
+    pub fn for_resolution(width: u32, height: u32) -> Self {
+        const MALI_TILE_SIZE: u32 = 16;
+
+        Self {
+            tile_width: MALI_TILE_SIZE,
+            tile_height: MALI_TILE_SIZE,
+            bins_x: (width + MALI_TILE_SIZE - 1) / MALI_TILE_SIZE,
+            bins_y: (height + MALI_TILE_SIZE - 1) / MALI_TILE_SIZE,
+            enable_hsr: true,
+            enable_early_z: true,
+        }
+    }
+
+    /// Get total number of tiles
+    pub fn total_tiles(&self) -> u32 {
+        self.bins_x * self.bins_y
+    }
+
+    /// Get tile memory estimate in KB
+    pub fn tile_memory_kb(&self) -> u32 {
+        // Each tile needs storage for color + depth + stencil
+        // Rough estimate: 2KB per tile for 16x16 RGBA8 + D24S8
+        self.total_tiles() * 2
+    }
+
+    /// Calculate optimal bin count for Mali-G68 L2 cache
+    pub fn optimal_bins_for_l2(&self) -> (u32, u32) {
+        // Mali-G68 has 512KB L2 cache
+        // Target: fit 4-8 tiles in L2 simultaneously
+        const TARGET_TILES_IN_L2: u32 = 6;
+        const TILE_SIZE_KB: u32 = 2;
+        let max_tiles_in_l2 = 512 / TILE_SIZE_KB; // ~256 tiles theoretical
+
+        let optimal_group = max_tiles_in_l2.min(TARGET_TILES_IN_L2);
+
+        // Group bins into chunks that fit in L2
+        let group_x = (self.bins_x + optimal_group - 1) / optimal_group;
+        let group_y = optimal_group.min(self.bins_y);
+
+        (group_x.max(1), group_y.max(1))
+    }
+}
 
 /// Draw call parameters for non-indexed draws
 #[derive(Debug, Clone, Copy)]
@@ -255,6 +324,30 @@ pub fn encode_draw_indexed_cmd(info: &DrawIndexedInfo) -> [u32; 8] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_tile_config_creation() {
+        let config = TileConfig::for_resolution(1280, 720);
+        assert_eq!(config.tile_width, 16);
+        assert_eq!(config.tile_height, 16);
+        assert_eq!(config.bins_x, 80);
+        assert_eq!(config.bins_y, 45);
+        assert!(config.enable_hsr);
+        assert!(config.enable_early_z);
+    }
+
+    #[test]
+    fn test_tile_count() {
+        let config = TileConfig::for_resolution(640, 480);
+        assert_eq!(config.total_tiles(), 40 * 30);
+    }
+
+    #[test]
+    fn test_tile_memory_estimate() {
+        let config = TileConfig::for_resolution(1920, 1080);
+        let mem_kb = config.tile_memory_kb();
+        assert!(mem_kb > 0);
+    }
 
     #[test]
     fn test_draw_info_default() {

@@ -362,7 +362,7 @@ mod tests {
 
     #[test]
     fn test_physical_device_creation() {
-        let gpu_info = GpuInfo::mali_g68_mp5();
+        let gpu_info = GpuInfo::mali_g68_mp4();
         let device = VkPhysicalDevice::new(gpu_info, ash::vk::API_VERSION_1_3);
         assert_eq!(device.device_type(), PhysicalDeviceType::IntegratedGpu);
         assert_eq!(device.properties.vendor_id, 0x13B5);
@@ -370,7 +370,7 @@ mod tests {
 
     #[test]
     fn test_memory_types() {
-        let gpu_info = GpuInfo::mali_g68_mp5();
+        let gpu_info = GpuInfo::mali_g68_mp4();
         let device = VkPhysicalDevice::new(gpu_info, ash::vk::API_VERSION_1_3);
         let mem_props = device.memory_properties();
         assert_eq!(mem_props.memory_types.len(), 3);
@@ -381,7 +381,7 @@ mod tests {
 
     #[test]
     fn test_queue_families() {
-        let gpu_info = GpuInfo::mali_g68_mp5();
+        let gpu_info = GpuInfo::mali_g68_mp4();
         let device = VkPhysicalDevice::new(gpu_info, ash::vk::API_VERSION_1_3);
         let queue_families = device.queue_family_properties();
         assert_eq!(queue_families.len(), 3);
@@ -392,7 +392,7 @@ mod tests {
 
     #[test]
     fn test_extension_support() {
-        let gpu_info = GpuInfo::mali_g68_mp5();
+        let gpu_info = GpuInfo::mali_g68_mp4();
         let device = VkPhysicalDevice::new(gpu_info, ash::vk::API_VERSION_1_3);
         assert!(device.is_extension_supported("VK_KHR_swapchain"));
         assert!(device.is_extension_supported("VK_KHR_dynamic_rendering"));

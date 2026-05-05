@@ -12,6 +12,10 @@ categories = ["hardware-support", "graphics", "os::android-apis"]
 name = "mali_g68"
 crate-type = ["cdylib", "rlib"]
 
+# Android shared library configuration
+[package.metadata.android.package]
+name = "libmali_g68.so"
+
 [[bench]]
 name = "shader_compile"
 harness = false
@@ -26,7 +30,7 @@ bitfield = "0.17"
 
 # System / FFI
 libc = "0.2"
-nix = { version = "0.29", features = ["mman", "ioctl", "fs"] }
+nix = { version = "0.29", features = ["mman", "fs"] }
 
 # DRM
 drm = "0.12.0"

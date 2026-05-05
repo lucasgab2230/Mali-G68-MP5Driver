@@ -1,35 +1,57 @@
-//! Mali-G68 MP5 GPU identification and capability detection
+//! Mali-G68 MP4 GPU identification and capability detection
 //!
-//! The Mali-G68 MP5 is a Valhall-architecture GPU with 5 shader cores,
-//! found in the Exynos 1280 SoC (Samsung Galaxy A26 5G, A53 5G, etc.)
+//! The Mali-G68 MP4 is a Valhall-architecture GPU with 4 shader cores,
+//! found in the Samsung Exynos 1280 SoC. It supports Vulkan 1.3,
+//! OpenGL ES 3.2, and OpenCL 2.0.
 //!
-//! ## Key Specifications
-//!
-//! | Feature              | Value                     |
-//! |----------------------|---------------------------|
-//! | Architecture         | Valhall (2nd gen)         |
-//! | Shader Cores         | 5                         |
-//! | L2 Cache             | 512 KB                    |
-//! | Max Frequency        | ~950 MHz                  |
-//! | Max Texels/clk       | 20 (5 cores × 4)          |
-//! | Max FMA/clk          | 40 (5 cores × 8)          |
-//! | Vulkan Version       | 1.3 (with extensions)     |
-//! | AFBC                 | v1.3                      |
+//! | Specification        | Value                     |
+//! |---------------------|---------------------------|
+//! | Architecture        | Valhall (2nd Gen)         |
+//! | Shader Cores        | 4 (MP4)                   |
+//! | Shading Units       | 128 (32 per core)         |
+//! | Max Frequency       | ~897 MHz                  |
+//! | L2 Cache            | 256 KB                    |
+//! | AFBC Version        | v1.3 (lossless + wide)    |
+//! | Vulkan Version      | 1.3                       |
+//! | OpenGL ES Version   | 3.2                       |
 
-use crate::{DRIVER_VERSION, L2_CACHE_SIZE, LOG_TARGET, MAX_SHADER_CORES};
-use log::info;
+use crate::LOG_TARGET;
+use log::{debug, info, warn};
 
-/// GPU product ID for Mali-G68 (from GPU_ID register)
-pub const GPU_ID_MALI_G68: u32 = 0x9080;
+/// Mali-G68 MP4 GPU ID
+pub const MALI_G68_MP4_GPU_ID: u32 = 0x907;
 
-/// Known SoC integrations with Mali-G68 MP5
+/// Driver version constant
+pub const DRIVER_VERSION: u32 = 42;
+
+/// Known SoC integrations with Mali-G68 MP4
+#[derive(Debug, Clone)]
+pub struct SocInfo {
+    pub soc_name: String,
+    pub max_freq_mhz: u32,
+    pub memory_type: String,
+    pub memory_bandwidth_mbps: u32,
+    pub process_nm: u32,
+}
+
+/// Known devices with Mali-G68 MP4
+pub fn known_devices() -> Vec<SocInfo> {
+    vec![
+        SocInfo {
+            soc_name: "Samsung Exynos 1280".to_string(),
+            max_freq_mhz: 897,
+            memory_type: "LPDDR4X".to_string(),
+            memory_bandwidth_mbps: 17000,
+            process_nm: 5,
+        },
+    ]
+}
+
+/// Known SoC models
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocModel {
-    /// Samsung Exynos 1280 (Galaxy A53 5G, A26 5G)
     Exynos1280,
-    /// MediaTek Dimensity 1080
     Mt6895,
-    /// Unknown SoC
     Unknown,
 }
 
@@ -152,24 +174,24 @@ pub struct ShaderFeatures {
 }
 
 impl GpuInfo {
-    /// Create GpuInfo for the Mali-G68 MP5 with default specifications
-    pub fn mali_g68_mp5() -> Self {
+    /// Create GpuInfo for the Mali-G68 MP4 with default specifications
+    pub fn mali_g68_mp4() -> Self {
         Self {
             arch: GpuArch::ValhallGen2,
-            gpu_id: GPU_ID_MALI_G68,
-            num_shader_cores: MAX_SHADER_CORES,
-            l2_cache_size: L2_CACHE_SIZE,
-            max_freq_mhz: 950,
+            gpu_id: 0x907,
+            num_shader_cores: 4,
+            l2_cache_size: 256 * 1024,
+            max_freq_mhz: 897,
             soc: SocModel::detect(),
-            engines_per_core: 4,
-            max_threads_per_core: 640,
-            max_registers_per_core: 65536,
-            max_task_threads: 256,
+            engines_per_core: 2,
+            max_threads_per_core: 512,
+            max_registers_per_core: 256,
+            max_task_threads: 16,
             afbc_version: 3,
             afbc_wide_block: true,
             afbc_lossless: true,
             tiler_features: TilerFeatures {
-                max_bin_size: crate::TILER_BIN_SIZE,
+                max_bin_size: 64,
                 num_levels: 4,
                 hierarchical: true,
             },
@@ -186,23 +208,19 @@ impl GpuInfo {
                 float16: true,
                 int8: true,
                 int16: true,
-                int64: false,
-                max_shared_memory: 32 * 1024,
-                max_workgroup_invocations: 256,
-                max_workgroup_size: [256, 256, 256],
+                int64: true,
+                max_shared_memory: 32768,
+                max_workgroup_invocations: 512,
+                max_workgroup_size: [512, 512, 512],
             },
         }
     }
 
     /// Detect GPU from DRM device
     pub fn detect_from_drm(_drm_fd: std::os::unix::io::RawFd) -> Result<Self, GpuDetectError> {
-        let info = Self::mali_g68_mp5();
+        let info = Self::mali_g68_mp4();
 
-        // Read GPU_ID register via DRM_IOCTL
-        // In production, this uses drm-ffi to read the GPU_ID register
-        // For now, we trust the Mali-G68 MP5 defaults
-        info!(target: LOG_TARGET, "Detected GPU: Mali-G68 MP5 (ID=0x{:04x})", info.gpu_id);
-        info!(target: LOG_TARGET, "  SoC: {}", info.soc.name());
+        info!(target: LOG_TARGET, "Detected GPU: Mali-G68 MP4 (ID=0x{:04x})", info.gpu_id);
         info!(target: LOG_TARGET, "  Shader cores: {}", info.num_shader_cores);
         info!(target: LOG_TARGET, "  L2 cache: {} KB", info.l2_cache_size / 1024);
         info!(target: LOG_TARGET, "  Max freq: {} MHz", info.max_freq_mhz);
@@ -213,7 +231,7 @@ impl GpuInfo {
     /// Compute the GPU name string for Vulkan
     pub fn device_name(&self) -> String {
         format!(
-            "Mali-G68 MP5 ({} cores, {})",
+            "Mali-G68 MP4 ({} cores, {})",
             self.num_shader_cores,
             self.soc.name()
         )
@@ -221,17 +239,17 @@ impl GpuInfo {
 
     /// Compute total FMA throughput per clock
     pub fn fma_per_clock(&self) -> u32 {
-        self.num_shader_cores * self.engines_per_core * 2 // 2 FMA pipes per engine
+        self.num_shader_cores * self.engines_per_core * 2
     }
 
     /// Compute total texel throughput per clock
     pub fn texels_per_clock(&self) -> u32 {
-        self.num_shader_cores * self.engines_per_core // 1 tex pipe per engine
+        self.num_shader_cores * self.engines_per_core
     }
 
     /// Compute total pixel throughput per clock
     pub fn pixels_per_clock(&self) -> u32 {
-        self.num_shader_cores * self.engines_per_core // 1 pixel pipe per engine
+        self.num_shader_cores * self.engines_per_core
     }
 
     /// Get Vulkan driver version encoded as u32
@@ -267,30 +285,68 @@ pub enum GpuDetectError {
     IncompatibleArch(String),
 }
 
+/// GPU status information
+#[derive(Debug, Clone)]
+pub struct GpuStatus {
+    /// Whether GPU is idle
+    pub idle: bool,
+    /// Current temperature in Celsius
+    pub temperature_celsius: f32,
+    /// Current utilization percentage
+    pub utilization_percent: f32,
+    /// Current memory usage in MB
+    pub memory_usage_mb: u32,
+}
+
+/// Device information (simplified for user-space)
+#[derive(Debug, Clone)]
+pub struct DeviceInfo {
+    /// Device name
+    pub name: String,
+    /// Vendor ID
+    pub vendor_id: u32,
+    /// Device ID
+    pub device_id: u32,
+    /// Driver version
+    pub driver_version: String,
+    /// Number of shader cores
+    pub shader_cores: u32,
+    /// Maximum frequency in MHz
+    pub max_frequency_mhz: u32,
+    /// Memory size in MB
+    pub memory_size_mb: u32,
+    /// Number of tiler bins
+    pub tiler_bins: u32,
+    /// L2 cache size in KB
+    pub l2_cache_size_kb: u32,
+    /// Supported features
+    pub features: Vec<String>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_gpu_info_defaults() {
-        let info = GpuInfo::mali_g68_mp5();
-        assert_eq!(info.gpu_id, GPU_ID_MALI_G68);
-        assert_eq!(info.num_shader_cores, 5);
-        assert_eq!(info.l2_cache_size, 512 * 1024);
+        let info = GpuInfo::mali_g68_mp4();
+        assert_eq!(info.gpu_id, MALI_G68_MP4_GPU_ID);
+        assert_eq!(info.num_shader_cores, 4);
+        assert_eq!(info.l2_cache_size, 256 * 1024);
         assert_eq!(info.arch, GpuArch::ValhallGen2);
     }
 
     #[test]
     fn test_throughput() {
-        let info = GpuInfo::mali_g68_mp5();
-        assert_eq!(info.fma_per_clock(), 40);
-        assert_eq!(info.texels_per_clock(), 20);
-        assert_eq!(info.pixels_per_clock(), 20);
+        let info = GpuInfo::mali_g68_mp4();
+        assert_eq!(info.fma_per_clock(), 16);
+        assert_eq!(info.texels_per_clock(), 8);
+        assert_eq!(info.pixels_per_clock(), 8);
     }
 
     #[test]
     fn test_vulkan_version_support() {
-        let info = GpuInfo::mali_g68_mp5();
+        let info = GpuInfo::mali_g68_mp4();
         assert!(info.supports_vulkan_version(1, 1));
         assert!(info.supports_vulkan_version(1, 3));
         assert!(!info.supports_vulkan_version(1, 4));
@@ -298,9 +354,9 @@ mod tests {
 
     #[test]
     fn test_device_name() {
-        let info = GpuInfo::mali_g68_mp5();
+        let info = GpuInfo::mali_g68_mp4();
         let name = info.device_name();
         assert!(name.contains("Mali-G68"));
-        assert!(name.contains("5 cores"));
+        assert!(name.contains("4 cores"));
     }
 }

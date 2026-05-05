@@ -213,6 +213,8 @@ pub enum NirOp {
     LoadInterpolatedInput,
 
     // Memory
+    /// load: generic load operation
+    Load,
     /// load_ubo: load from uniform buffer
     LoadUbo,
     /// load_ssbo: load from shader storage buffer

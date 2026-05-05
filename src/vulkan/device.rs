@@ -159,7 +159,7 @@ mod tests {
 
     #[test]
     fn test_device_creation() {
-        let gpu_info = GpuInfo::mali_g68_mp5();
+        let gpu_info = GpuInfo::mali_g68_mp4();
         let physical = VkPhysicalDevice::new(gpu_info, ash::vk::API_VERSION_1_3);
         let create_info = VkDeviceCreateInfo {
             enabled_extensions: vec!["VK_KHR_swapchain".to_string()],

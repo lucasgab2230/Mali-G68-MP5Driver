@@ -29,8 +29,8 @@ pub const MAX_CSF_QUEUES_PER_GROUP: u32 = 4;
 /// Maximum number of CSF queues total
 pub const MAX_CSF_QUEUES: u32 = MAX_CSF_GROUPS * MAX_CSF_QUEUES_PER_GROUP;
 
-/// Default command buffer size (256 KB)
-pub const DEFAULT_CMDBUF_SIZE: u64 = 256 * 1024;
+/// Default command buffer size (512 KB) - Increased for batching
+pub const DEFAULT_CMDBUF_SIZE: u64 = 512 * 1024;
 
 /// Command buffer page alignment
 pub const CMDBUF_ALIGN: u64 = 4096;
@@ -208,6 +208,10 @@ pub struct CsfQueue {
     cmds_submitted: AtomicU64,
     /// Whether the queue is active
     active: AtomicU32,
+    /// Pending doorbell ring count (for batching)
+    pending_doorbell: AtomicU32,
+    /// Last doorbell ring timestamp
+    last_doorbell: AtomicU64,
 }
 
 impl CsfQueue {
@@ -229,6 +233,8 @@ impl CsfQueue {
             cmdbuf_size: DEFAULT_CMDBUF_SIZE as u32,
             cmds_submitted: AtomicU64::new(0),
             active: AtomicU32::new(0),
+            pending_doorbell: AtomicU32::new(0),
+            last_doorbell: AtomicU64::new(0),
         }
     }
 
@@ -315,8 +321,9 @@ impl CsfQueue {
         self.write_ptr.store(new_write_ptr, Ordering::Release);
         self.cmds_submitted.fetch_add(1, Ordering::Relaxed);
 
-        // Ring doorbell to notify GPU
-        self.ring_doorbell();
+        // Batch doorbell rings to reduce GPU interrupts
+        self.pending_doorbell.fetch_add(1, Ordering::Relaxed);
+        self.maybe_ring_doorbell();
     }
 
     /// Write a NOP packet (padding / synchronization)
@@ -346,10 +353,36 @@ impl CsfQueue {
             self.queue_idx,
             self.write_ptr.load(Ordering::Acquire)
         );
+        // Update last doorbell timestamp
+        self.last_doorbell.store(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_millis() as u64,
+            Ordering::Relaxed,
+        );
         // In a real implementation, this writes to the CSF_DOORBELL register:
         // unsafe {
         //     reg_write32(gpu_base, CSF_DOORBELL, (queue_idx << 16) | write_ptr);
         // }
+    }
+
+    /// Check if we should ring the doorbell (batching optimization)
+    fn maybe_ring_doorbell(&self) {
+        let pending = self.pending_doorbell.load(Ordering::Relaxed);
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64;
+        let last = self.last_doorbell.load(Ordering::Relaxed);
+
+        // Ring doorbell if:
+        // 1. We have 8+ pending commands, OR
+        // 2. It's been >1ms since last doorbell
+        if pending >= 8 || (now > last && now - last > 1) {
+            self.pending_doorbell.store(0, Ordering::Relaxed);
+            self.ring_doorbell();
+        }
     }
 
     /// Reset the queue (after GPU reset)

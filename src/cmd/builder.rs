@@ -33,7 +33,8 @@ pub enum CommandBufferState {
 struct RenderPassState {
     /// Whether we're inside a render pass
     inside: bool,
-    /// Current subpass index
+    #[allow(dead_code)]
+    #[allow(clippy::derive_impls)]
     subpass: u32,
     /// Render pass width
     width: u32,
@@ -55,6 +56,8 @@ struct PipelineState {
     /// Currently bound compute pipeline (0 = none)
     compute_pipeline: u64,
     /// Current primitive topology
+    #[allow(dead_code)]
+    #[allow(clippy::derive_impls)]
     topology: PrimitiveTopology,
     /// Bound vertex buffer count
     vertex_buffer_count: u32,
@@ -71,6 +74,68 @@ impl Default for PipelineState {
             vertex_buffer_count: 0,
             descriptor_set_count: 0,
         }
+    }
+}
+
+/// Batched draw call for merging compatible draws
+#[derive(Debug, Clone)]
+struct BatchedDraw {
+    /// Draw info
+    info: DrawInfo,
+    /// Pipeline state hash
+    pipeline_hash: u64,
+    /// Vertex buffer state hash
+    vertex_state_hash: u64,
+    /// Timestamp for batching decisions
+    timestamp: std::time::Instant,
+}
+
+/// State change tracker for optimization
+#[derive(Debug, Clone)]
+struct StateChangeTracker {
+    /// Last pipeline change timestamp
+    last_pipeline_change: std::time::Instant,
+    /// Last vertex buffer change timestamp
+    last_vertex_change: std::time::Instant,
+    /// Last descriptor set change timestamp
+    last_descriptor_change: std::time::Instant,
+    /// Consecutive state changes counter
+    consecutive_changes: u32,
+}
+
+impl StateChangeTracker {
+    fn new() -> Self {
+        Self {
+            last_pipeline_change: std::time::Instant::now(),
+            last_vertex_change: std::time::Instant::now(),
+            last_descriptor_change: std::time::Instant::now(),
+            consecutive_changes: 0,
+        }
+    }
+
+    fn track_pipeline_change(&mut self) {
+        self.last_pipeline_change = std::time::Instant::now();
+        self.consecutive_changes += 1;
+    }
+
+    fn track_vertex_change(&mut self) {
+        self.last_vertex_change = std::time::Instant::now();
+        self.consecutive_changes += 1;
+    }
+
+    fn track_descriptor_change(&mut self) {
+        self.last_descriptor_change = std::time::Instant::now();
+        self.consecutive_changes += 1;
+    }
+
+    fn should_batch_draws(&self) -> bool {
+        // Batch if we haven't had state changes recently
+        let now = std::time::Instant::now();
+        let pipeline_stable = now.duration_since(self.last_pipeline_change).as_millis() > 16;
+        let vertex_stable = now.duration_since(self.last_vertex_change).as_millis() > 16;
+        let descriptor_stable = now.duration_since(self.last_descriptor_change).as_millis() > 16;
+
+        pipeline_stable && vertex_stable && descriptor_stable
     }
 }
 
@@ -94,6 +159,16 @@ pub struct CommandBufferBuilder {
     size_bytes: u64,
     /// Command buffer handle/ID
     handle: u64,
+    /// Batched draw calls for merging
+    batched_draws: Vec<BatchedDraw>,
+    /// State change tracking for optimization
+    state_changes: StateChangeTracker,
+    /// Ultra batching mode for emulator optimization
+    batching_enabled: bool,
+    /// Maximum batch size for draw merging
+    max_batch_size: u32,
+    /// Number of draws merged via batching
+    draws_merged: u32,
 }
 
 impl CommandBufferBuilder {
@@ -101,7 +176,7 @@ impl CommandBufferBuilder {
     pub fn new(handle: u64) -> Self {
         Self {
             state: CommandBufferState::Recording,
-            commands: Vec::with_capacity(4096),
+            commands: Vec::with_capacity(8192),
             render_pass: RenderPassState {
                 inside: false,
                 subpass: 0,
@@ -117,7 +192,43 @@ impl CommandBufferBuilder {
             copy_count: 0,
             size_bytes: 0,
             handle,
+            batched_draws: Vec::with_capacity(256),
+            state_changes: StateChangeTracker::new(),
+            batching_enabled: false,
+            max_batch_size: 32,
+            draws_merged: 0,
         }
+    }
+
+    /// Enable or disable ultra batching mode
+    pub fn set_batching_mode(&mut self, enabled: bool) {
+        self.batching_enabled = enabled;
+        trace!(
+            target: LOG_TARGET,
+            "CommandBuffer {:x}: batching mode {}",
+            self.handle,
+            if enabled { "enabled" } else { "disabled" }
+        );
+    }
+
+    /// Set maximum batch size for draw merging
+    pub fn set_max_batch_size(&mut self, size: u32) {
+        self.max_batch_size = size.max(1).min(256);
+        trace!(
+            target: LOG_TARGET,
+            "CommandBuffer {:x}: max batch size set to {}",
+            self.handle, self.max_batch_size
+        );
+    }
+
+    /// Get number of draws merged via batching
+    pub fn draws_merged_count(&self) -> u32 {
+        self.draws_merged
+    }
+
+    /// Check if batching is enabled
+    pub fn is_batching_enabled(&self) -> bool {
+        self.batching_enabled
     }
 
     /// Begin recording commands
@@ -184,6 +295,7 @@ impl CommandBufferBuilder {
             return; // Already bound, skip redundant state write
         }
         self.pipeline.graphics_pipeline = pipeline_addr;
+        self.state_changes.track_pipeline_change();
 
         self.commands
             .push((CsfPacketType::SetShaderProgram as u32) | (2 << 8));
@@ -209,6 +321,7 @@ impl CommandBufferBuilder {
     /// Bind vertex buffers
     pub fn bind_vertex_buffers(&mut self, first_binding: u32, bindings: &[VertexBindingDesc]) {
         self.pipeline.vertex_buffer_count = bindings.len() as u32;
+        self.state_changes.track_vertex_change();
 
         let payload_len = 1 + (bindings.len() as u32 * 3);
         self.commands
@@ -225,6 +338,7 @@ impl CommandBufferBuilder {
     /// Bind descriptor sets
     pub fn bind_descriptor_sets(&mut self, first_set: u32, set_addrs: &[u64]) {
         self.pipeline.descriptor_set_count = set_addrs.len() as u32;
+        self.state_changes.track_descriptor_change();
 
         let payload_len = 1 + (set_addrs.len() as u32 * 2);
         self.commands
@@ -271,6 +385,52 @@ impl CommandBufferBuilder {
 
     /// Record a draw command (non-indexed)
     pub fn draw(&mut self, info: &DrawInfo) {
+        if self.batching_enabled && self.can_batch_draw(info) {
+            self.batch_draw(info);
+            return;
+        }
+
+        self.flush_batched_draws();
+        self.emit_draw(info);
+    }
+
+    /// Check if a draw can be batched with current state
+    fn can_batch_draw(&self, info: &DrawInfo) -> bool {
+        if info.vertex_count > 4096 || info.instance_count > 256 {
+            return false;
+        }
+
+        if self.batched_draws.len() >= self.max_batch_size as usize {
+            return false;
+        }
+
+        if self.batched_draws.is_empty() {
+            return true;
+        }
+
+        self.batched_draws.last().unwrap().pipeline_hash == self.pipeline.graphics_pipeline
+            && self.batched_draws.last().unwrap().vertex_state_hash
+                == self.pipeline.vertex_buffer_count as u64
+    }
+
+    /// Add draw to batch
+    fn batch_draw(&mut self, info: &DrawInfo) {
+        let batched_draw = BatchedDraw {
+            info: *info,
+            pipeline_hash: self.pipeline.graphics_pipeline,
+            vertex_state_hash: self.pipeline.vertex_buffer_count as u64,
+            timestamp: std::time::Instant::now(),
+        };
+        self.batched_draws.push(batched_draw);
+        self.draws_merged += 1;
+
+        if self.batched_draws.len() >= self.max_batch_size as usize {
+            self.flush_batched_draws();
+        }
+    }
+
+    /// Emit a single draw command
+    fn emit_draw(&mut self, info: &DrawInfo) {
         self.commands.push((CsfPacketType::Draw as u32) | (4 << 8));
         self.commands.push(info.vertex_count);
         self.commands.push(info.instance_count);
@@ -278,6 +438,45 @@ impl CommandBufferBuilder {
         self.commands.push(info.first_instance);
         self.size_bytes += 20;
         self.draw_count += 1;
+    }
+
+    /// Flush all batched draw calls as a merged draw
+    fn flush_batched_draws(&mut self) {
+        if self.batched_draws.is_empty() {
+            return;
+        }
+
+        let batch_count = self.batched_draws.len();
+
+        if self.batching_enabled && batch_count > 1 {
+            let mut merged_vertices = 0u32;
+            let mut merged_instances = 0u32;
+            for draw in &self.batched_draws {
+                merged_vertices += draw.info.vertex_count;
+                merged_instances = merged_instances.max(draw.info.instance_count);
+            }
+
+            let merged_info = DrawInfo {
+                vertex_count: merged_vertices,
+                instance_count: merged_instances,
+                first_vertex: 0,
+                first_instance: 0,
+            };
+
+            trace!(
+                target: LOG_TARGET,
+                "CommandBuffer {:x}: merging {} draws -> 1 ({} vertices)",
+                self.handle, batch_count, merged_vertices
+            );
+
+            self.emit_draw(&merged_info);
+        } else {
+            while let Some(batched_draw) = self.batched_draws.pop() {
+                self.emit_draw(&batched_draw.info);
+            }
+        }
+
+        self.batched_draws.clear();
     }
 
     /// Record a draw command (indexed)
@@ -341,6 +540,9 @@ impl CommandBufferBuilder {
 
     /// End recording commands
     pub fn end(&mut self) {
+        // Flush any remaining batched draws
+        self.flush_batched_draws();
+
         self.state = CommandBufferState::Executable;
         trace!(
             target: LOG_TARGET,
@@ -394,6 +596,9 @@ impl CommandBufferBuilder {
         self.size_bytes = 0;
         self.render_pass.inside = false;
         self.pipeline = PipelineState::default();
+        self.batched_draws.clear();
+        self.state_changes = StateChangeTracker::new();
+        self.draws_merged = 0;
     }
 }
 
