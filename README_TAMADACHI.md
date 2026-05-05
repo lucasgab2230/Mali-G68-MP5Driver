@@ -21,7 +21,7 @@ let tamadachi = TamadachiOptimizer::new_for_tamadachi(base_optimizer);
 
 // Resultado:
 // - Character sprites: 64 draws → 1 batch
-// - UI elements: 32 draws → 1 batch  
+// - UI elements: 32 draws → 1 batch
 // - Background tiles: 128 draws → 2 batches
 // - Particle effects: 256 draws → 4 batches
 ```
@@ -87,10 +87,10 @@ let tamadachi_optimizer = TamadachiOptimizer::new_for_tamadachi(base_optimizer);
 loop {
     // Aplicar otimizações Tamadachi ao command buffer
     tamadachi_optimizer.optimize_command_buffer(&mut cmd_buf);
-    
+
     // Renderizar frame otimizado
     render_frame_with_tamadachi_optimizations();
-    
+
     // Ajustar otimizações dinamicamente
     let metrics = tamadachi_optimizer.get_metrics();
     tamadachi_optimizer.adjust_for_performance(metrics.current_fps);

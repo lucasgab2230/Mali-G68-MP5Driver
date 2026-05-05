@@ -44,12 +44,12 @@ let mali_context = init_user_space_driver(config)?;
 // Loop de renderização do emulador
 loop {
     mali_context.begin_frame()?;
-    
+
     // Renderização do jogo
     render_game_frame(&mali_context)?;
-    
+
     mali_context.end_frame()?;
-    
+
     // Obter métricas
     let metrics = mali_context.get_metrics();
     println!("FPS: {:.1}", metrics.current_fps);
@@ -209,7 +209,7 @@ let memory_usage = mali_context.get_memory_usage();
 println!("FPS: {:.1}", metrics.current_fps);
 println!("Frame Time: {:.2}ms", metrics.avg_frame_time_ms);
 println!("GPU Utilization: {:.1}%", memory_usage.utilization_percent);
-println!("Memory Used: {:.1}MB / {:.0}MB", 
+println!("Memory Used: {:.1}MB / {:.0}MB",
     memory_usage.used_mb, memory_usage.total_mb);
 println!("Draw Calls/Frame: {}", metrics.draw_calls_per_frame);
 println!("Cache Hit Rate: {:.1}%", metrics.cache_hit_rate);

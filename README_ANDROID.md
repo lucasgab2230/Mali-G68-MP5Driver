@@ -85,13 +85,13 @@ let mut optimizer = SnapdragonOptimizer::new(60, pool_manager);
 // Loop principal
 loop {
     optimizer.begin_frame();
-    
+
     // Comandos de renderização
     cmd_buf.draw(&draw_info);
     cmd_buf.draw_indexed(&indexed_info);
-    
+
     optimizer.end_frame();
-    
+
     // Obter métricas
     let metrics = optimizer.get_metrics();
     println!("FPS: {:.1}", metrics.current_fps);
@@ -158,7 +158,7 @@ O driver expõe métricas de performance via `/sys/class/mali0/device/`:
 
 ### Compatibilidade de Jogos
 - GameCube/Wii: 100% compatível
-- PSP: 95% compatível  
+- PSP: 95% compatível
 - 3DS: 90% compatível
 - Switch: 85% compatível
 
