@@ -36,15 +36,13 @@ pub struct SocInfo {
 
 /// Known devices with Mali-G68 MP4
 pub fn known_devices() -> Vec<SocInfo> {
-    vec![
-        SocInfo {
-            soc_name: "Samsung Exynos 1280".to_string(),
-            max_freq_mhz: 897,
-            memory_type: "LPDDR4X".to_string(),
-            memory_bandwidth_mbps: 17000,
-            process_nm: 5,
-        },
-    ]
+    vec![SocInfo {
+        soc_name: "Samsung Exynos 1280".to_string(),
+        max_freq_mhz: 897,
+        memory_type: "LPDDR4X".to_string(),
+        memory_bandwidth_mbps: 17000,
+        process_nm: 5,
+    }]
 }
 
 /// Known SoC models

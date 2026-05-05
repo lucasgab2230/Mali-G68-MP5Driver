@@ -6,7 +6,7 @@
 
 use crate::cmd::builder::CommandBufferBuilder;
 use crate::cmd::draw::{DrawInfo, PrimitiveTopology, VertexBindingDesc, VertexFormat};
-use crate::emulator::cache::{PipelineCache, PipelineCacheKey, hash_spirv};
+use crate::emulator::cache::{hash_spirv, PipelineCache, PipelineCacheKey};
 use crate::emulator::snapdragon_opt::SnapdragonOptimizer;
 use crate::LOG_TARGET;
 use log::{debug, info, warn};
@@ -145,9 +145,7 @@ pub enum OptimizationLevel {
 
 impl TamadachiOptimizer {
     /// Create optimizer specifically for Tamadachi Life
-    pub fn new_for_tamadachi(
-        base_optimizer: Arc<RwLock<SnapdragonOptimizer>>,
-    ) -> Self {
+    pub fn new_for_tamadachi(base_optimizer: Arc<RwLock<SnapdragonOptimizer>>) -> Self {
         info!(target: LOG_TARGET, "Initializing Kamadachi Life optimizations");
 
         let mut shader_cache = TamadachiShaderCache::new();
@@ -394,13 +392,8 @@ impl TamadachiOptimizer {
         pipeline_hash: u64,
         vertex_buffer_addr: u64,
     ) {
-        self.draw_batcher.submit(
-            pattern,
-            draw,
-            pipeline_hash,
-            vertex_buffer_addr,
-            None,
-        );
+        self.draw_batcher
+            .submit(pattern, draw, pipeline_hash, vertex_buffer_addr, None);
     }
 
     /// Flush all pending batches to command buffer
@@ -482,13 +475,15 @@ impl TextureAtlas {
         }
     }
 
-    fn allocate_region(&mut self, width: u32, height: u32, texture_hash: u64) -> Option<TextureRegion> {
+    fn allocate_region(
+        &mut self,
+        width: u32,
+        height: u32,
+        texture_hash: u64,
+    ) -> Option<TextureRegion> {
         let (x, y) = self.find_free_slot(width, height)?;
 
-        let uv_min = (
-            x as f32 / self.width as f32,
-            y as f32 / self.height as f32,
-        );
+        let uv_min = (x as f32 / self.width as f32, y as f32 / self.height as f32);
         let uv_max = (
             (x + width) as f32 / self.width as f32,
             (y + height) as f32 / self.height as f32,
@@ -648,15 +643,12 @@ impl DrawBatchAggregator {
         vertex_buffer_addr: u64,
         atlas_region_idx: Option<u32>,
     ) {
-        let existing_batch = self
-            .pending_batches
-            .iter_mut()
-            .find(|batch| {
-                batch.pattern == pattern
-                    && batch.pipeline_hash == pipeline_hash
-                    && batch.vertex_buffer_addr == vertex_buffer_addr
-                    && batch.draws.len() < self.max_batch_size
-            });
+        let existing_batch = self.pending_batches.iter_mut().find(|batch| {
+            batch.pattern == pattern
+                && batch.pipeline_hash == pipeline_hash
+                && batch.vertex_buffer_addr == vertex_buffer_addr
+                && batch.draws.len() < self.max_batch_size
+        });
 
         if let Some(batch) = existing_batch {
             batch.draws.push(BatchedDrawEntry {
@@ -687,7 +679,7 @@ impl DrawBatchAggregator {
 
     fn flush(&mut self, cmd_buf: &mut CommandBufferBuilder) {
         let batches: Vec<DrawBatch> = self.pending_batches.drain(..).collect();
-        
+
         for batch in batches {
             self.total_draws_merged += batch.draws.len() as u32;
             Self::emit_batch_static(cmd_buf, &batch);

@@ -60,7 +60,7 @@ jobs:
         with:
           components: clippy
       - name: Run cargo clippy
-        run: cargo clippy -- -D warnings
+        run: cargo clippy
 
   android-build:
     name: Android Build

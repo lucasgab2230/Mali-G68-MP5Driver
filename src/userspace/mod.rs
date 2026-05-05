@@ -25,13 +25,13 @@
 
 pub mod context;
 pub mod device;
-pub mod renderer;
 pub mod memory;
+pub mod renderer;
 
 pub use context::UserSpaceContext;
 pub use device::UserSpaceDevice;
-pub use renderer::UserSpaceRenderer;
 pub use memory::UserSpaceMemory;
+pub use renderer::UserSpaceRenderer;
 
 /// User-space driver configuration
 #[derive(Debug, Clone)]
@@ -84,23 +84,23 @@ pub enum UserSpaceError {
     /// DRM device not found
     #[error("DRM device not found: {0}")]
     DeviceNotFound(String),
-    
+
     /// Permission denied (need access to DRM)
     #[error("Permission denied accessing DRM device: {0}")]
     PermissionDenied(String),
-    
+
     /// GPU initialization failed
     #[error("GPU initialization failed: {0}")]
     GpuInitFailed(String),
-    
+
     /// Memory allocation failed
     #[error("Memory allocation failed: {0}")]
     MemoryAllocationFailed(String),
-    
+
     /// Vulkan initialization failed
     #[error("Vulkan initialization failed: {0}")]
     VulkanInitFailed(String),
-    
+
     /// Invalid configuration
     #[error("Invalid configuration: {0}")]
     InvalidConfig(String),
