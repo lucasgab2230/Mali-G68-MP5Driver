@@ -83,7 +83,7 @@ impl UserSpaceDevice {
         // Look for Mali DRM device
         let entries = std::fs::read_dir(drm_dir)
             .map_err(|e| UserSpaceError::DeviceNotFound(format!("Cannot read /dev/dri: {}", e)))?;
-        
+
         for entry in entries {
             let entry = entry.map_err(|e| {
                 UserSpaceError::DeviceNotFound(format!("Cannot read DRM entry: {}", e))

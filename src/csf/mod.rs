@@ -21,5 +21,5 @@ pub mod firmware;
 pub mod queue;
 
 pub use firmware::CsfFirmware;
-pub use queue::CsfQueue;
 pub use queue::CsfPacketType;
+pub use queue::CsfQueue;

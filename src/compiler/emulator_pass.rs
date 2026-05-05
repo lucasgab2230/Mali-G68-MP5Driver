@@ -469,7 +469,7 @@ fn count_dual_issue_opportunities(shader: &NirShader) -> u32 {
                     NirOp::Load | NirOp::StoreOutput | NirOp::StoreSsbo | NirOp::StoreShared
                 );
 
-                if (last_was_alu && is_lsu) || (last_was_alu && is_lsu) {
+                if last_was_alu && is_lsu {
                     dual_issue_count += 1;
                 }
 
@@ -684,9 +684,9 @@ fn optimize_text_rendering(shader: &mut NirShader) -> u32 {
 
     for func in &mut shader.functions {
         for block in &mut func.blocks {
-            block.instructions.retain(|instr| {
-                !matches!(instr.op, NirOp::Discard | NirOp::Demote)
-            });
+            block
+                .instructions
+                .retain(|instr| !matches!(instr.op, NirOp::Discard | NirOp::Demote));
         }
     }
 
