@@ -98,7 +98,7 @@ impl UserSpaceContext {
     /// End current frame
     pub fn end_frame(&self) -> UserSpaceResult<()> {
         if self.config.enable_debug {
-            debug!(target: LOG_TARGET, "Ending frame {}", 
+            debug!(target: LOG_TARGET, "Ending frame {}",
                 self.frame_count.load(std::sync::atomic::Ordering::Relaxed));
         }
 
