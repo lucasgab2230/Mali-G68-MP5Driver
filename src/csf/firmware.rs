@@ -62,7 +62,7 @@ pub struct CsfFirmwareInterface {
 /// CSF firmware magic number
 pub const CSF_FIRMWARE_MAGIC: u32 = 0x43534631; // "CSF1"
 
-/// CSF firmware features
+// CSF firmware features
 bitflags::bitflags! {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct CsfFirmwareFeatures: u32 {

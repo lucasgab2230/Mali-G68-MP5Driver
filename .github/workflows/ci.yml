@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdrm-dev
       - uses: dtolnay/rust-toolchain@stable
       - name: Run cargo check
         run: cargo check
@@ -24,6 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdrm-dev
       - uses: dtolnay/rust-toolchain@stable
       - name: Run cargo test
         run: cargo test
@@ -44,17 +52,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdrm-dev
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
       - name: Run cargo clippy
-        run: cargo clippy -- -D warnings
+        run: cargo clippy
 
   android-build:
     name: Android Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdrm-dev
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android

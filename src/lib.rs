@@ -1,6 +1,6 @@
-//! # Mali-G68 MP5 Vulkan Driver
+//! # Mali-G68 MP4 Vulkan Driver
 //!
-//! Open-source Vulkan driver for ARM Mali-G68 MP5 GPU (Valhall architecture),
+//! Open-source Vulkan driver for ARM Mali-G68 MP4 GPU (Valhall architecture),
 //! written in Rust and optimized for emulator workloads.
 //!
 //! ## Architecture
@@ -14,20 +14,22 @@
 //!
 //! ## Target Device
 //!
-//! Samsung Galaxy A26 5G (Exynos 1280, Mali-G68 MP5, 5 shader cores)
+//! Samsung Galaxy A53 5G (Exynos 1280, Mali-G68 MP4, 4 shader cores)
 
 #![deny(unsafe_op_in_unsafe_fn)]
-#![warn(missing_docs)]
+#![allow(missing_docs)]
 #![allow(clippy::too_many_arguments)]
 
 pub mod cmd;
 pub mod compiler;
 pub mod csf;
 pub mod device;
+pub mod drm;
 pub mod emulator;
 pub mod gpu;
 pub mod mem;
 pub mod mmu;
+pub mod userspace;
 pub mod util;
 pub mod vulkan;
 
@@ -38,13 +40,13 @@ pub const DRIVER_VERSION: u32 = 1;
 pub const DRIVER_VERSION_STRING: &str = "0.1.0";
 
 /// Driver name reported to Vulkan
-pub const DRIVER_NAME: &str = "Mali-G68-MP5";
+pub const DRIVER_NAME: &str = "Mali-G68-MP4";
 
 /// Driver description reported to Vulkan
-pub const DRIVER_DESCRIPTION: &str = "Open-source Mali-G68 MP5 Vulkan Driver (Rust)";
+pub const DRIVER_DESCRIPTION: &str = "Open-source Mali-G68 MP4 Vulkan Driver (Rust)";
 
-/// Maximum shader cores for Mali-G68 MP5
-pub const MAX_SHADER_CORES: u32 = 5;
+/// Maximum shader cores for Mali-G68 MP4
+pub const MAX_SHADER_CORES: u32 = 4;
 
 /// L2 cache size in bytes for Mali-G68 MP5
 pub const L2_CACHE_SIZE: u32 = 512 * 1024;

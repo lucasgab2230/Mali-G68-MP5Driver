@@ -134,7 +134,7 @@ impl VkInstance {
     /// Enumerate available physical devices
     pub fn enumerate_physical_devices(&self) -> Result<Vec<VkPhysicalDevice>, InstanceError> {
         // For Mali-G68 MP5, we typically have exactly one GPU
-        let gpu_info = GpuInfo::mali_g68_mp5();
+        let gpu_info = GpuInfo::mali_g68_mp4();
         let physical_device = VkPhysicalDevice::new(gpu_info, self.api_version);
         Ok(vec![physical_device])
     }

@@ -1,0 +1,57 @@
+[package]
+name = "mali-g68-userspace"
+version = "0.1.0"
+edition = "2021"
+description = "User-space Mali-G68 MP5 driver library for emulator integration"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/lucasgab2230/Mali-G68-MP5Driver"
+keywords = ["mali", "gpu", "emulator", "userspace", "eden"]
+categories = ["hardware-support", "graphics", "emulators"]
+
+[lib]
+name = "mali_g68_userspace"
+crate-type = ["cdylib", "rlib"]
+
+[[example]]
+name = "eden_integration"
+path = "examples/eden_integration.rs"
+
+[dependencies]
+# Core driver functionality (re-exported)
+mali-g68-mp5-driver = { path = "..", features = ["vulkan_1_3"] }
+
+# System / FFI
+libc = "0.2"
+nix = { version = "0.29", features = ["mman", "ioctl", "fs"] }
+
+# DRM
+drm = "0.12.0"
+drm-ffi = "0.8.0"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Concurrency
+parking_lot = "0.12"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 1
+debug = 2
+
+[features]
+default = ["vulkan_1_3"]
+vulkan_1_1 = []
+vulkan_1_2 = ["vulkan_1_1"]
+vulkan_1_3 = ["vulkan_1_2"]
+debug = []

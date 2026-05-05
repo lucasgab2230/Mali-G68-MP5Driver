@@ -10,5 +10,6 @@ pub mod info;
 pub mod regs;
 pub mod tiler;
 
+pub use info::DeviceInfo;
 pub use info::GpuInfo;
 pub use regs::*;

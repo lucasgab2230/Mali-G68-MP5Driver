@@ -270,7 +270,7 @@ mod tests {
 
     #[test]
     fn test_tiler_config() {
-        let gpu = GpuInfo::mali_g68_mp5();
+        let gpu = GpuInfo::mali_g68_mp4();
         let config = TilerConfig::new(&gpu, 640, 480);
         assert_eq!(config.bins_x(), 10); // 640 / 64
         assert_eq!(config.bins_y(), 8); // 480 / 64
@@ -279,7 +279,7 @@ mod tests {
 
     #[test]
     fn test_tiler_descriptor_encoding() {
-        let gpu = GpuInfo::mali_g68_mp5();
+        let gpu = GpuInfo::mali_g68_mp4();
         let config = TilerConfig::new(&gpu, 320, 240);
         let ctx = TilerContext::new(config, 0x1000_0000, 0x10_0000);
         let desc = ctx.encode_tiler_descriptor();

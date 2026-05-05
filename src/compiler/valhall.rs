@@ -142,7 +142,7 @@ impl ValhallReg {
     }
 }
 
-/// Valhall instruction modifiers
+// Valhall instruction modifiers
 bitflags::bitflags! {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct ValhallModifiers: u32 {

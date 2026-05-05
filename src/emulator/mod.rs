@@ -18,6 +18,12 @@
 
 pub mod async_compute;
 pub mod cache;
+pub mod exynos1280_opt;
+pub mod snapdragon_opt;
+pub mod tamadachi_opt;
 
 pub use async_compute::AsyncComputeManager;
 pub use cache::PipelineCache;
+pub use exynos1280_opt::{Exynos1280Metrics, Exynos1280Optimizer};
+pub use snapdragon_opt::{PerformanceMetrics, SnapdragonOptimizer};
+pub use tamadachi_opt::{TamadachiMetrics, TamadachiOptimizer};
