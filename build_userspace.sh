@@ -91,7 +91,7 @@ typedef struct {
 MaliG68Context* mali_g68_init(const MaliG68Config* config);
 int mali_g68_begin_frame(MaliG68Context* ctx);
 int mali_g68_end_frame(MaliG68Context* ctx);
-int mali_g68_render_2d(MaliG68Context* ctx, 
+int mali_g68_render_2d(MaliG68Context* ctx,
                         unsigned long texture_addr,
                         unsigned long vertex_buffer_addr,
                         unsigned int width,
@@ -117,38 +117,38 @@ cat > src/c_wrapper.c << 'EOF'
 // Simple C wrapper for the Rust user-space driver
 extern MaliG68Context* mali_g68_init_from_env() {
     MaliG68Config config = {0};
-    
+
     // Read from environment variables
     if (getenv("MALI_OPT_LEVEL")) {
         config.enable_optimizations = atoi(getenv("MALI_OPT_LEVEL"));
     } else {
         config.enable_optimizations = 1;
     }
-    
+
     if (getenv("MALI_TARGET_FPS")) {
         config.target_fps = atoi(getenv("MALI_TARGET_FPS"));
     } else {
         config.target_fps = 60;
     }
-    
+
     if (getenv("MALI_MEMORY_POOL")) {
         config.memory_pool_size_mb = atoi(getenv("MALI_MEMORY_POOL"));
     } else {
         config.memory_pool_size_mb = 512;
     }
-    
+
     if (getenv("MALI_DEBUG")) {
         config.enable_debug = atoi(getenv("MALI_DEBUG"));
     } else {
         config.enable_debug = 0;
     }
-    
+
     if (getenv("MALI_DRM_DEVICE")) {
         config.drm_device_path = strdup(getenv("MALI_DRM_DEVICE"));
     } else {
         config.drm_device_path = NULL;
     }
-    
+
     return mali_g68_init(&config);
 }
 
@@ -351,21 +351,21 @@ int main() {
         printf("Failed to initialize Mali-G68 driver\\n");
         return 1;
     }
-    
+
     // Main emulation loop
     while (running) {
         mali_g68_begin_frame(ctx);
-        
+
         // Your rendering code here
         render_frame(ctx);
-        
+
         mali_g68_end_frame(ctx);
-        
+
         // Get performance metrics
         MaliG68Metrics metrics = mali_g68_get_metrics(ctx);
         printf("FPS: %.1f\\n", metrics.current_fps);
     }
-    
+
     // Cleanup
     mali_g68_cleanup(ctx);
     return 0;

@@ -393,7 +393,7 @@ impl DrmDeviceManager {
             }
         }
 
-        debug!(target: LOG_TARGET, "Created buffer object: handle={}, size={} bytes", 
+        debug!(target: LOG_TARGET, "Created buffer object: handle={}, size={} bytes",
             create.handle, size);
 
         Ok(create.handle)
@@ -419,7 +419,7 @@ impl DrmDeviceManager {
             }
         }
 
-        debug!(target: LOG_TARGET, "Mapped buffer object: handle={}, addr={:#x}", 
+        debug!(target: LOG_TARGET, "Mapped buffer object: handle={}, addr={:#x}",
             handle, mmap.address);
 
         Ok(mmap.address)
@@ -443,7 +443,7 @@ impl DrmDeviceManager {
             }
         }
 
-        debug!(target: LOG_TARGET, "Submitted command buffer: addr={:#x}, size={}, fence={}", 
+        debug!(target: LOG_TARGET, "Submitted command buffer: addr={:#x}, size={}, fence={}",
             cmd_buf, cmd_size, submit.fence);
 
         Ok(submit.fence)
