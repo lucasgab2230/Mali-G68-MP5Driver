@@ -45,7 +45,7 @@ parking_lot = "0.12"
 crossbeam-channel = "0.5"
 
 # Collections & utilities
-hashbrown = "0.14"
+hashbrown = "0.17"
 rustc-hash = "2.0"
 smallvec = "1.13"
 typed-arena = "2.0"
