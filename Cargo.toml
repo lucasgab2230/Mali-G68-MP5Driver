@@ -51,7 +51,7 @@ smallvec = "1.13"
 typed-arena = "2.0"
 
 # Error handling
-thiserror = "1.0"
+thiserror = "2.0"
 anyhow = "1.0"
 
 # Shader compiler FFI (piper / SPIR-V)
