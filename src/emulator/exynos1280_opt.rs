@@ -4,11 +4,11 @@
 //! characteristics that require specialized optimizations:
 //!
 //! - **Memory Bandwidth**: Limited to ~17 GB/s
-//! - **Cache Configuration**: 256KB L2, 32KB L1 per core
+//! - **Cache Configuration**: 256KB L2, 32KB L1 per Multi-Processor
 //! - **Thermal Constraints**: Aggressive throttling at 85°C (TJMax 95°C)
 //! - **Power Management**: Conservative power states
 //! - **Clock Speeds**: Max 897MHz GPU, 2.4GHz CPU (5nm process)
-//! - **GPU Cores**: 4 cores (MP4 configuration)
+//! - **GPU Cores**: 4 Multi-Processors (MP4 configuration)
 //!
 //! This module implements optimizations specifically tuned for these constraints.
 
@@ -116,7 +116,7 @@ pub enum BandwidthAllocationStrategy {
 pub struct ExynosCacheConfig {
     /// L2 cache size (512KB)
     l2_size: u32,
-    /// L1 cache per core (32KB)
+    /// L1 cache per Multi-Processor (32KB)
     l1_size: u32,
     /// Cache line size (64 bytes)
     cache_line_size: u32,
@@ -281,7 +281,7 @@ impl Exynos1280Optimizer {
         // Optimize for 512KB L2 cache
         self.optimize_for_l2_cache(cmd_buf);
 
-        // Optimize for 32KB L1 cache per core
+        // Optimize for 32KB L1 cache per Multi-Processor
         self.optimize_for_l1_cache(cmd_buf);
 
         // Optimize cache line usage (64 bytes)
@@ -407,15 +407,15 @@ impl Exynos1280Optimizer {
         debug!(target: LOG_TARGET, "Optimizing for 512KB L2 cache");
     }
 
-    /// Optimize for L1 cache (32KB per core)
-    fn optimize_for_l1_cache(&self, cmd_buf: &mut CommandBufferBuilder) {
-        // In a real implementation, this would:
-        // 1. Optimize for per-core L1 cache
-        // 2. Use cache-aware threading
-        // 3. Minimize cache sharing between cores
-        // 4. Optimize for 32KB size
+/// Optimize for L1 cache (32KB per Multi-Processor)
+fn optimize_for_l1_cache(&self, cmd_buf: &mut CommandBufferBuilder) {
+// In a real implementation, this would:
+// 1. Optimize for per-Multi-Processor L1 cache
+// 2. Use cache-aware threading
+// 3. Minimize cache sharing between Multi-Processors
+// 4. Optimize for 32KB size
 
-        debug!(target: LOG_TARGET, "Optimizing for 32KB L1 cache per core");
+debug!(target: LOG_TARGET, "Optimizing for 32KB L1 cache per Multi-Processor");
     }
 
     /// Optimize cache line usage (64 bytes)
@@ -674,7 +674,7 @@ impl ExynosCacheConfig {
     pub fn new() -> Self {
         Self {
             l2_size: 256,        // 256KB
-            l1_size: 32,         // 32KB per core
+    l1_size: 32, // 32KB per Multi-Processor
             cache_line_size: 64, // 64 bytes
             associativity: 8,    // 8-way associative
         }
