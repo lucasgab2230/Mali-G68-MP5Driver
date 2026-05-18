@@ -26,7 +26,7 @@ ash = "0.38"
 
 # Bitflags for hardware register definitions
 bitflags = "2.6"
-bitfield = "0.17"
+bitfield = "0.19"
 
 # System / FFI
 libc = "0.2"
