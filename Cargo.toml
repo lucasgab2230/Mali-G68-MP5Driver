@@ -55,7 +55,7 @@ thiserror = "2.0"
 anyhow = "1.0"
 
 # Shader compiler FFI (piper / SPIR-V)
-spirv = "0.3"
+spirv = "0.4"
 
 [build-dependencies]
 bindgen = "0.72"
