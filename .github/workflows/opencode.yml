@@ -14,18 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      contents: read
     steps:
-       - name: Checkout repository
-         uses: actions/checkout@v6
-         with:
-           fetch-depth: 1
-           persist-credentials: false
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
 
-       - name: Run OpenCode
+      - name: Run OpenCode
         uses: anomalyco/opencode/github@latest
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         with:
           model: nvidia/z-ai/glm-5.1
-          # share: true
-          # github_token: xxxx
