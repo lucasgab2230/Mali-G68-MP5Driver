@@ -33,7 +33,7 @@ libc = "0.2"
 nix = { version = "0.29", features = ["mman", "fs"] }
 
 # DRM/GPU subsystem
-drm = "0.12.0"
+drm = "0.15.0"
 drm-ffi = "0.9.1"
 
 # Logging
