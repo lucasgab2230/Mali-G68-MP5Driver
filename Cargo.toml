@@ -59,7 +59,7 @@ spirv = "0.4"
 
 [build-dependencies]
 bindgen = "0.72"
-cc = "1.0"
+cc = "1.2"
 
 [dev-dependencies]
 criterion = "0.8"
