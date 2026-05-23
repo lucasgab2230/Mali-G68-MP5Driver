@@ -69,7 +69,7 @@ impl MaliDevice {
         let address_space = AddressSpace::new(0, drm_fd, std::ptr::null_mut()).ok();
 
         info!(target: LOG_TARGET, "Mali-G68 MP5 device initialized successfully");
-    info!(target: LOG_TARGET, " {} Multi-Processors, {} MB L2", gpu_info.num_shader_cores, gpu_info.l2_cache_size / (1024 * 1024));
+        info!(target: LOG_TARGET, " {} Multi-Processors, {} MB L2", gpu_info.num_shader_cores, gpu_info.l2_cache_size / (1024 * 1024));
         info!(target: LOG_TARGET, "  {} queues, {} memory pools", queues.len(), 7);
 
         Ok(Self {

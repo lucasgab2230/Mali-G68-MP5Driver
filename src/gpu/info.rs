@@ -219,7 +219,7 @@ impl GpuInfo {
         let info = Self::mali_g68_mp4();
 
         info!(target: LOG_TARGET, "Detected GPU: Mali-G68 MP4 (ID=0x{:04x})", info.gpu_id);
-    info!(target: LOG_TARGET, " Multi-Processors: {}", info.num_shader_cores);
+        info!(target: LOG_TARGET, " Multi-Processors: {}", info.num_shader_cores);
         info!(target: LOG_TARGET, "  L2 cache: {} KB", info.l2_cache_size / 1024);
         info!(target: LOG_TARGET, "  Max freq: {} MHz", info.max_freq_mhz);
 

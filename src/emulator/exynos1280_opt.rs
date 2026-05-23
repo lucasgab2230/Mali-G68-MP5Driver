@@ -407,15 +407,15 @@ impl Exynos1280Optimizer {
         debug!(target: LOG_TARGET, "Optimizing for 512KB L2 cache");
     }
 
-/// Optimize for L1 cache (32KB per Multi-Processor)
-fn optimize_for_l1_cache(&self, cmd_buf: &mut CommandBufferBuilder) {
-// In a real implementation, this would:
-// 1. Optimize for per-Multi-Processor L1 cache
-// 2. Use cache-aware threading
-// 3. Minimize cache sharing between Multi-Processors
-// 4. Optimize for 32KB size
+    /// Optimize for L1 cache (32KB per Multi-Processor)
+    fn optimize_for_l1_cache(&self, cmd_buf: &mut CommandBufferBuilder) {
+        // In a real implementation, this would:
+        // 1. Optimize for per-Multi-Processor L1 cache
+        // 2. Use cache-aware threading
+        // 3. Minimize cache sharing between Multi-Processors
+        // 4. Optimize for 32KB size
 
-debug!(target: LOG_TARGET, "Optimizing for 32KB L1 cache per Multi-Processor");
+        debug!(target: LOG_TARGET, "Optimizing for 32KB L1 cache per Multi-Processor");
     }
 
     /// Optimize cache line usage (64 bytes)
@@ -674,7 +674,7 @@ impl ExynosCacheConfig {
     pub fn new() -> Self {
         Self {
             l2_size: 256,        // 256KB
-    l1_size: 32, // 32KB per Multi-Processor
+            l1_size: 32,         // 32KB per Multi-Processor
             cache_line_size: 64, // 64 bytes
             associativity: 8,    // 8-way associative
         }
