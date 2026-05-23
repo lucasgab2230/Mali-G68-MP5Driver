@@ -1,19 +1,19 @@
 //! Mali-G68 MP4 GPU identification and capability detection
 //!
-//! The Mali-G68 MP4 is a Valhall-architecture GPU with 4 shader cores,
+//! The Mali-G68 MP4 is a Valhall-architecture GPU with 4 Multi-Processors,
 //! found in the Samsung Exynos 1280 SoC. It supports Vulkan 1.3,
 //! OpenGL ES 3.2, and OpenCL 2.0.
 //!
-//! | Specification        | Value                     |
+//! | Specification | Value |
 //! |---------------------|---------------------------|
-//! | Architecture        | Valhall (2nd Gen)         |
-//! | Shader Cores        | 4 (MP4)                   |
-//! | Shading Units       | 128 (32 per core)         |
-//! | Max Frequency       | ~897 MHz                  |
-//! | L2 Cache            | 256 KB                    |
-//! | AFBC Version        | v1.3 (lossless + wide)    |
-//! | Vulkan Version      | 1.3                       |
-//! | OpenGL ES Version   | 3.2                       |
+//! | Architecture | Valhall (2nd Gen) |
+//! | Multi-Processors | 4 (MP4) |
+//! | Shading Units | 128 (32 per Multi-Processor) |
+//! | Max Frequency | ~897 MHz |
+//! | L2 Cache | 256 KB |
+//! | AFBC Version | v1.3 (lossless + wide) |
+//! | Vulkan Version | 1.3 |
+//! | OpenGL ES Version | 3.2 |
 
 use crate::LOG_TARGET;
 use log::{debug, info, warn};
@@ -92,7 +92,7 @@ pub struct GpuInfo {
     pub arch: GpuArch,
     /// GPU product ID from hardware
     pub gpu_id: u32,
-    /// Number of shader cores
+    /// Number of Multi-Processors
     pub num_shader_cores: u32,
     /// L2 cache size in bytes
     pub l2_cache_size: u32,
@@ -100,13 +100,13 @@ pub struct GpuInfo {
     pub max_freq_mhz: u32,
     /// Detected SoC model
     pub soc: SocModel,
-    /// Number of execution engines per core
+    /// Number of execution engines per Multi-Processor
     pub engines_per_core: u32,
-    /// Maximum threads per core
+    /// Maximum threads per Multi-Processor
     pub max_threads_per_core: u32,
-    /// Maximum registers per core
+    /// Maximum registers per Multi-Processor
     pub max_registers_per_core: u32,
-    /// Maximum task threads per core
+    /// Maximum task threads per Multi-Processor
     pub max_task_threads: u32,
     /// AFBC version supported
     pub afbc_version: u32,
@@ -219,7 +219,7 @@ impl GpuInfo {
         let info = Self::mali_g68_mp4();
 
         info!(target: LOG_TARGET, "Detected GPU: Mali-G68 MP4 (ID=0x{:04x})", info.gpu_id);
-        info!(target: LOG_TARGET, "  Shader cores: {}", info.num_shader_cores);
+    info!(target: LOG_TARGET, " Multi-Processors: {}", info.num_shader_cores);
         info!(target: LOG_TARGET, "  L2 cache: {} KB", info.l2_cache_size / 1024);
         info!(target: LOG_TARGET, "  Max freq: {} MHz", info.max_freq_mhz);
 
@@ -229,7 +229,7 @@ impl GpuInfo {
     /// Compute the GPU name string for Vulkan
     pub fn device_name(&self) -> String {
         format!(
-            "Mali-G68 MP4 ({} cores, {})",
+            "Mali-G68 MP4 ({} Multi-Processors, {})",
             self.num_shader_cores,
             self.soc.name()
         )
@@ -307,7 +307,7 @@ pub struct DeviceInfo {
     pub device_id: u32,
     /// Driver version
     pub driver_version: String,
-    /// Number of shader cores
+    /// Number of Multi-Processors
     pub shader_cores: u32,
     /// Maximum frequency in MHz
     pub max_frequency_mhz: u32,
@@ -355,6 +355,6 @@ mod tests {
         let info = GpuInfo::mali_g68_mp4();
         let name = info.device_name();
         assert!(name.contains("Mali-G68"));
-        assert!(name.contains("4 cores"));
+        assert!(name.contains("4 Multi-Processors"));
     }
 }

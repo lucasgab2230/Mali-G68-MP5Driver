@@ -17,7 +17,7 @@ Bring **Turnip-level** Vulkan driver performance to devices with Mali-G68 MP5 GP
 | **Phone** | Samsung Galaxy A26 5G |
 | **SoC** | Exynos 1280 |
 | **GPU** | ARM Mali-G68 MP5 (Valhall Gen2) |
-| **Shader Cores** | 5 |
+| **Multi-Processors** | 5 |
 | **L2 Cache** | 512 KB |
 | **Max Frequency** | ~950 MHz |
 | **Architecture** | Valhall (2nd Gen) |
@@ -43,7 +43,7 @@ Bring **Turnip-level** Vulkan driver performance to devices with Mali-G68 MP5 GP
 │  Buffer Objects · Slab Allocator · Memory Pools · MMU     │
 ├─────────────────────────────────────────────────────────┤
 │                  GPU Hardware Layer                       │
-│  Registers · Tiler · Shader Cores · L2 Cache · AFBC      │
+│ Registers · Tiler · Multi-Processors · L2 Cache · AFBC │
 └─────────────────────────────────────────────────────────┘
 ```
 

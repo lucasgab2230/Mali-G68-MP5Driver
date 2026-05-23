@@ -22,7 +22,7 @@
 //!   - W8 wavefront optimization (8-thread wavefronts)
 //!   - FP16 throughput optimization (2x FP16 vs FP32)
 //!   - Dual-issue scheduling (ALU + LSU in same cycle)
-//!   - Register file optimization (128x 128-bit registers per core)
+//! - Register file optimization (128x 128-bit registers per Multi-Processor)
 
 use crate::compiler::nir::*;
 use crate::compiler::optimize::OptLevel;
@@ -381,9 +381,9 @@ fn fold_ubo_loads(_shader: &mut NirShader) -> u32 {
 ///
 /// - Wavefront size: 8 threads (vs 32/64 on other GPUs)
 /// - Dual-issue: ALU + LSU can execute in same cycle
-/// - Register file: 128 x 128-bit registers per shader core
-/// - L1 cache: 32KB per core, shared across wavefronts
-/// - L2 cache: 512KB shared across all 5 cores
+/// - Register file: 128 x 128-bit registers per Multi-Processor
+/// - L1 cache: 32KB per Multi-Processor, shared across wavefronts
+/// - L2 cache: 512KB shared across all 5 Multi-Processors
 pub fn optimize_valhall_wavefront(shader: &mut NirShader, level: OptLevel) -> WavefrontOptStats {
     let mut stats = WavefrontOptStats::default();
 

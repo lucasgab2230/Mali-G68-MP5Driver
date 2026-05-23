@@ -14,7 +14,7 @@
 //!
 //! ## Target Device
 //!
-//! Samsung Galaxy A53 5G (Exynos 1280, Mali-G68 MP4, 4 shader cores)
+//! Samsung Galaxy A53 5G (Exynos 1280, Mali-G68 MP4, 4 Multi-Processors)
 
 #![deny(unsafe_op_in_unsafe_fn)]
 #![allow(missing_docs)]
@@ -45,7 +45,7 @@ pub const DRIVER_NAME: &str = "Mali-G68-MP4";
 /// Driver description reported to Vulkan
 pub const DRIVER_DESCRIPTION: &str = "Open-source Mali-G68 MP4 Vulkan Driver (Rust)";
 
-/// Maximum shader cores for Mali-G68 MP4
+/// Maximum Multi-Processors for Mali-G68 MP4
 pub const MAX_SHADER_CORES: u32 = 4;
 
 /// L2 cache size in bytes for Mali-G68 MP5
