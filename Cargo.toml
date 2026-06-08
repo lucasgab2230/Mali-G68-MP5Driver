@@ -25,7 +25,7 @@ harness = false
 ash = "0.38"
 
 # Bitflags for hardware register definitions
-bitflags = "2.6"
+bitflags = "2.13"
 bitfield = "0.19"
 
 # System / FFI
